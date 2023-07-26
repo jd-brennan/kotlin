@@ -45975,6 +45975,12 @@ public class FirLightTreeBlackBoxCodegenTestGenerated extends AbstractFirLightTr
             }
 
             @Test
+            @TestMetadata("inlineClassInterface.kt")
+            public void testInlineClassInterface() throws Exception {
+                runTest("compiler/testData/codegen/box/reflection/callBy/inlineClassInterface.kt");
+            }
+
+            @Test
             @TestMetadata("inlineClassMembers.kt")
             public void testInlineClassMembers() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/callBy/inlineClassMembers.kt");
@@ -46098,6 +46104,12 @@ public class FirLightTreeBlackBoxCodegenTestGenerated extends AbstractFirLightTr
             @TestMetadata("simpleTopLevelFunction.kt")
             public void testSimpleTopLevelFunction() throws Exception {
                 runTest("compiler/testData/codegen/box/reflection/callBy/simpleTopLevelFunction.kt");
+            }
+
+            @Test
+            @TestMetadata("valueClassInterface.kt")
+            public void testValueClassInterface() throws Exception {
+                runTest("compiler/testData/codegen/box/reflection/callBy/valueClassInterface.kt");
             }
         }
 
