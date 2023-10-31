@@ -84,7 +84,7 @@ internal fun checkConstantArguments(
             return checkConstantArguments(expression.compareToCall, session)
         }
         expression is FirStringConcatenationCall -> {
-            for (exp in (expression as FirCall).arguments) {
+            for (exp in expression.arguments) {
                 if (exp is FirResolvedQualifier || exp is FirGetClassCall) {
                     return ConstantArgumentKind.NOT_CONST
                 }
@@ -96,7 +96,7 @@ internal fun checkConstantArguments(
                 return ConstantArgumentKind.NOT_CONST
             }
 
-            for (exp in (expression as FirCall).arguments) {
+            for (exp in expression.arguments) {
                 if (exp is FirConstExpression<*> && exp.value == null) {
                     return ConstantArgumentKind.NOT_CONST
                 }
