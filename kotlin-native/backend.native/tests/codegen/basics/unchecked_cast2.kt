@@ -12,7 +12,7 @@ fun runTest() {
     try {
         val x = cast<String>(Any())
         println(x.length)
-    } catch (e: Throwable) {
+    } catch (e: ClassCastException) {
         println("Ok")
     }
 }

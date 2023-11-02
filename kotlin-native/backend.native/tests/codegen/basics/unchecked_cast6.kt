@@ -1,0 +1,20 @@
+/*
+ * Copyright 2010-2023 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the LICENSE file.
+ */
+
+package codegen.basics.unchecked_cast6
+
+import kotlin.test.*
+
+class Data(val x: Int)
+
+@Test
+fun runTest() {
+    val arr = arrayOf("zzz")
+    try {
+        (arr as Array<Data>).forEach { println(it.x) }
+    } catch (e: ClassCastException) {
+        println("Ok")
+    }
+}
