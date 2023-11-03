@@ -571,6 +571,7 @@ tasks.register("unchecked_cast1", KonanLocalTest) {
 }
 
 tasks.register("unchecked_cast2", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/basics/unchecked_cast2.kt"
 }
@@ -586,21 +587,25 @@ tasks.register("unchecked_cast4", KonanLocalTest) {
 }
 
 tasks.register("unchecked_cast5", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/basics/unchecked_cast5.kt"
 }
 
 tasks.register("unchecked_cast6", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/basics/unchecked_cast6.kt"
 }
 
 tasks.register("unchecked_cast7", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/basics/unchecked_cast7.kt"
 }
 
 tasks.register("unchecked_cast8", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/basics/unchecked_cast8.kt"
 }
@@ -1358,27 +1363,33 @@ tasks.register("bridges_test18", KonanLocalTest) {
     source = "codegen/bridges/test18.kt"
 }
 
+// For the next 5 tests the bridges get ignored because of devirtualization.
 tasks.register("bridges_test19", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/bridges/test19.kt"
 }
 
 tasks.register("bridges_test20", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/bridges/test20.kt"
 }
 
 tasks.register("bridges_test21", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/bridges/test21.kt"
 }
 
 tasks.register("bridges_test22", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/bridges/test22.kt"
 }
 
 tasks.register("bridges_test23", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/bridges/test23.kt"
 }
