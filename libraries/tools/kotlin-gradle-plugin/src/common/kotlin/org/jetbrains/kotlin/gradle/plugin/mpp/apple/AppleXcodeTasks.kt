@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.FrameworkCopy.Companion.dsymFile
 import org.jetbrains.kotlin.gradle.plugin.mpp.enabledOnCurrentHost
 import org.jetbrains.kotlin.gradle.tasks.FatFrameworkTask
+import org.jetbrains.kotlin.gradle.tasks.dependsOn
 import org.jetbrains.kotlin.gradle.tasks.locateOrRegisterTask
 import org.jetbrains.kotlin.gradle.tasks.registerTask
 import org.jetbrains.kotlin.gradle.utils.getFile
@@ -63,12 +64,8 @@ private object XcodeEnvironment {
             return AppleSdk.defineNativeTargets(sdk, archs)
         }
 
-    val frameworkSearchDir: File?
-        get() {
-            val configuration = System.getenv("CONFIGURATION") ?: return null
-            val sdk = System.getenv("SDK_NAME") ?: return null
-            return File(configuration, sdk)
-        }
+    val builtProductsDir: File?
+        get() = System.getenv("BUILT_PRODUCTS_DIR")?.let(::File)
 
     val embeddedFrameworksDir: File?
         get() {
@@ -91,7 +88,7 @@ private object XcodeEnvironment {
         XcodeEnvironment:
           buildType=$buildType
           targets=$targets
-          frameworkSearchDir=$frameworkSearchDir
+          buildProductDir=$builtProductsDir
           embeddedFrameworksDir=$embeddedFrameworksDir
           buildProductsDir=$buildProductsDir
           sign=$sign
@@ -118,9 +115,9 @@ private fun Project.registerAssembleAppleFrameworkTask(framework: Framework): Ta
     )
 
     val envBuildType = XcodeEnvironment.buildType
-    val envFrameworkSearchDir = XcodeEnvironment.frameworkSearchDir
+    val envBuiltProductsDir = XcodeEnvironment.builtProductsDir
 
-    if (envBuildType == null || envTargets.isEmpty() || envFrameworkSearchDir == null) {
+    if (envBuildType == null || envTargets.isEmpty() || envBuiltProductsDir == null) {
         val envConfiguration = System.getenv("CONFIGURATION")
         if (envTargets.isNotEmpty() && envConfiguration != null) {
             project.reportDiagnostic(KotlinToolingDiagnostics.UnknownAppleFrameworkBuildType(envConfiguration))
@@ -138,7 +135,7 @@ private fun Project.registerAssembleAppleFrameworkTask(framework: Framework): Ta
         needFatFramework -> locateOrRegisterTask<FatFrameworkTask>(frameworkTaskName) { task ->
             task.description = "Packs $frameworkBuildType fat framework for Xcode"
             task.baseName = framework.baseName
-            task.destinationDirProperty.fileProvider(appleFrameworkDir(envFrameworkSearchDir))
+            task.destinationDirProperty.set(envBuiltProductsDir)
             task.isEnabled = frameworkBuildType == envBuildType
         }.also {
             it.configure { task -> task.from(framework) }
@@ -149,7 +146,7 @@ private fun Project.registerAssembleAppleFrameworkTask(framework: Framework): Ta
             task.sourceFramework.fileProvider(framework.linkTaskProvider.flatMap { it.outputFile })
             task.sourceDsym.fileProvider(dsymFile(task.sourceFramework.mapToFile()))
             task.dependsOn(framework.linkTaskProvider)
-            task.destinationDirectory.fileProvider(appleFrameworkDir(envFrameworkSearchDir))
+            task.destinationDirectory.set(envBuiltProductsDir)
         }
     }
 }
@@ -215,7 +212,7 @@ internal fun Project.registerEmbedAndSignAppleFrameworkTask(framework: Framework
     val envBuildType = XcodeEnvironment.buildType
     val envTargets = XcodeEnvironment.targets
     val envEmbeddedFrameworksDir = XcodeEnvironment.embeddedFrameworksDir
-    val envFrameworkSearchDir = XcodeEnvironment.frameworkSearchDir
+    val envBuiltProductsDir = XcodeEnvironment.builtProductsDir
     val envSign = XcodeEnvironment.sign
     val userScriptSandboxingEnabled = XcodeEnvironment.userScriptSandboxingEnabled
 
@@ -225,7 +222,7 @@ internal fun Project.registerEmbedAndSignAppleFrameworkTask(framework: Framework
         AppleXcodeTasks.embedAndSignTaskPostfix
     )
 
-    if (envBuildType == null || envTargets.isEmpty() || envEmbeddedFrameworksDir == null || envFrameworkSearchDir == null) {
+    if (envBuildType == null || envTargets.isEmpty() || envEmbeddedFrameworksDir == null) {
         locateOrRegisterTask<DefaultTask>(frameworkTaskName) { task ->
             task.group = BasePlugin.BUILD_GROUP
             task.description = "Embed and sign ${framework.namePrefix} framework as requested by Xcode's environment variables"
@@ -268,13 +265,14 @@ internal fun Project.registerEmbedAndSignAppleFrameworkTask(framework: Framework
     }
 
     val assembleTask = registerAssembleAppleFrameworkTask(framework) ?: return
+    assembleTask.dependsOn(checkSandboxAndWriteProtectionTask)
+
     if (framework.buildType != envBuildType || !envTargets.contains(framework.konanTarget)) return
 
     embedAndSignTask.configure { task ->
         val frameworkFile = framework.outputFile
-        task.dependsOn(checkSandboxAndWriteProtectionTask)
         task.dependsOn(assembleTask)
-        task.sourceFramework.fileProvider(appleFrameworkDir(envFrameworkSearchDir).map { it.resolve(frameworkFile.name) })
+        task.sourceFramework.set(File(envBuiltProductsDir, frameworkFile.name))
         task.destinationDirectory.set(envEmbeddedFrameworksDir)
         if (envSign != null) {
             task.doLast {
@@ -295,12 +293,6 @@ private val Framework.namePrefix: String
         buildType,
         outputKind.taskNameClassifier
     )
-
-/**
- * If [frameworkSearchDir] is absolute use it, otherwise make it relative to buildDir/xcode-frameworks
- */
-private fun Project.appleFrameworkDir(frameworkSearchDir: File): Provider<File> =
-    layout.buildDirectory.dir("xcode-frameworks").map { it.asFile.resolve(frameworkSearchDir) }
 
 /**
  * macOS frameworks contain symlinks which are resolved/removed by the Gradle [Copy] task.
