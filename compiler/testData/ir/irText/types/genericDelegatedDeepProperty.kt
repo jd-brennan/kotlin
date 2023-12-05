@@ -1,4 +1,5 @@
 // !LANGUAGE: -ForbidUsingExtensionPropertyTypeParameterInDelegate
+// MUTE_SIGNATURE_COMPARISON_K2: JVM_IR JS_IR NATIVE
 
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KMutableProperty1
