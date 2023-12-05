@@ -23616,6 +23616,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
                 }
 
                 @Test
+                @TestMetadata("compare.kt")
+                public void testCompare() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/modifiers/const/compare.kt");
+                }
+
+                @Test
                 @TestMetadata("constInteraction.kt")
                 public void testConstInteraction() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/modifiers/const/constInteraction.kt");

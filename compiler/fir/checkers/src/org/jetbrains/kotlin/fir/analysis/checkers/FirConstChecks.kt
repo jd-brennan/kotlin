@@ -51,6 +51,8 @@ internal fun checkConstantArguments(
 
     fun FirExpression.getExpandedType() = resolvedType.fullyExpandedType(session)
 
+    if (expression.isForbiddenComplexConstant(session)) return ConstantArgumentKind.NOT_CONST
+
     when {
         expression is FirNamedArgumentExpression -> {
             checkConstantArguments(expression.expression, session)
@@ -93,10 +95,6 @@ internal fun checkConstantArguments(
         }
         expression is FirEqualityOperatorCall -> {
             if (expression.operation == FirOperation.IDENTITY || expression.operation == FirOperation.NOT_IDENTITY) {
-                return ConstantArgumentKind.NOT_CONST
-            }
-
-            if (expression.isForbiddenComplexConstant(session)) {
                 return ConstantArgumentKind.NOT_CONST
             }
 
@@ -162,7 +160,7 @@ internal fun checkConstantArguments(
             if (calleeReference !is FirResolvedNamedReference) return ConstantArgumentKind.NOT_CONST
             val symbol = calleeReference.resolvedSymbol as? FirNamedFunctionSymbol ?: return ConstantArgumentKind.NOT_CONST
 
-            if (!symbol.canBeEvaluated() && !expression.isCompileTimeBuiltinCall(session) || expression.isForbiddenComplexConstant(session)) {
+            if (!symbol.canBeEvaluated() && !expression.isCompileTimeBuiltinCall(session)) {
                 return ConstantArgumentKind.NOT_CONST
             }
 
@@ -228,6 +226,7 @@ private fun FirExpression.isComplexBooleanConstant(session: FirSession): Boolean
     return when {
         !resolvedType.fullyExpandedType(session).isBoolean -> false
         this is FirConstExpression<*> -> false
+        this is FirNamedArgumentExpression -> this.expression.isComplexBooleanConstant(session)
         usesVariableAsConstant -> false
         else -> true
     }
@@ -238,9 +237,12 @@ private fun FirExpression.isComplexBooleanConstant(session: FirSession): Boolean
  */
 @Suppress("RecursivePropertyAccessor")
 private val FirExpression.usesVariableAsConstant: Boolean
-    get() = this is FirPropertyAccessExpression && toResolvedCallableSymbol()?.isConst == true
+    get() = (this is FirPropertyAccessExpression && toResolvedCallableSymbol().let { (it is FirFieldSymbol && it.hasConstantInitializer) || it?.isConst == true }
+            || this is FirNamedArgumentExpression && this.expression.usesVariableAsConstant
             || this is FirQualifiedAccessExpression && explicitReceiver?.usesVariableAsConstant != false
             || this is FirCall && this.arguments.any { it.usesVariableAsConstant }
+            || this is FirBinaryLogicExpression && (this.leftOperand.usesVariableAsConstant || this.rightOperand.usesVariableAsConstant)
+            || this is FirComparisonExpression && this.compareToCall.usesVariableAsConstant)
 
 private val compileTimeFunctions = setOf(
     *OperatorNameConventions.BINARY_OPERATION_NAMES.toTypedArray(), *OperatorNameConventions.UNARY_OPERATION_NAMES.toTypedArray(),
