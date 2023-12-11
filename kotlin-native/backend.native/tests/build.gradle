@@ -610,6 +610,26 @@ tasks.register("unchecked_cast8", KonanLocalTest) {
     source = "codegen/basics/unchecked_cast8.kt"
 }
 
+tasks.register("unchecked_cast9", KonanLocalTest) {
+    useGoldenData = true
+    source = "codegen/basics/unchecked_cast9.kt"
+}
+
+tasks.register("unchecked_cast10", KonanLocalTest) {
+    useGoldenData = true
+    source = "codegen/basics/unchecked_cast10.kt"
+}
+
+tasks.register("unchecked_cast11", KonanLocalTest) {
+    useGoldenData = true
+    source = "codegen/basics/unchecked_cast11.kt"
+}
+
+tasks.register("unchecked_cast12", KonanLocalTest) {
+    useGoldenData = true
+    source = "codegen/basics/unchecked_cast12.kt"
+}
+
 tasks.register("null_check", KonanLocalTest) {
     source = "codegen/basics/null_check.kt"
 }
