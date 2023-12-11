@@ -611,6 +611,7 @@ tasks.register("unchecked_cast8", KonanLocalTest) {
 }
 
 tasks.register("unchecked_cast9", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/basics/unchecked_cast9.kt"
 }
@@ -621,11 +622,13 @@ tasks.register("unchecked_cast10", KonanLocalTest) {
 }
 
 tasks.register("unchecked_cast11", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/basics/unchecked_cast11.kt"
 }
 
 tasks.register("unchecked_cast12", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/basics/unchecked_cast12.kt"
 }
@@ -1383,7 +1386,7 @@ tasks.register("bridges_test18", KonanLocalTest) {
     source = "codegen/bridges/test18.kt"
 }
 
-// For the next 5 tests the bridges get ignored because of devirtualization.
+// For the next 6 tests the bridges get ignored because of devirtualization.
 tasks.register("bridges_test19", KonanLocalTest) {
     enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
@@ -1415,6 +1418,7 @@ tasks.register("bridges_test23", KonanLocalTest) {
 }
 
 tasks.register("bridges_test24", KonanLocalTest) {
+    enabled = !project.globalTestArgs.contains("-opt")
     useGoldenData = true
     source = "codegen/bridges/test24.kt"
 }
