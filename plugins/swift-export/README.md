@@ -9,7 +9,7 @@ This module represents an entry point for the SwiftExport-Frontend functionality
 ### How to build
 
 ```bash
-./gradlew kotlin-swift-export-compiler-plugin:build
+./gradlew kotlin-swift-export-compiler-plugin.embeddable:build
 ```
 
 This will produce the resulting jar (with all dependency embedded) at `%PATH_TO_KOTLIN_REPO%/plugins/swift-export/build/libs/kotlin-swift-export-compiler-plugin-%VERSION%.jar`
@@ -17,12 +17,17 @@ This will produce the resulting jar (with all dependency embedded) at `%PATH_TO_
 ### Example usage
 
 Given that:
-1. there is a `kotlinc` installed at `$PATH`
+1. there is a `konan-swift-export` installed at `$PATH`
 2. sources are located in the `app.kt` file
-3. the `$PLUGIN_PATH` variable contains the path to the jar received from the ["How to build"](#How-to-build) section 
+3. the `$PLUGIN_PATH` variable contains the path to the jar received from the ["How to build"](#How-to-build) section.
 
 ```bash
-kotlinc -language-version 2.0 app.kt -Xplugin=$PLUGIN_PATH -P plugin:org.jetbrains.kotlin.swiftexport:output_dir="~/my_awesome_directory/"
+konan-swift-export --swift-export-plugin-path $PLUGIN_PATH --swift-export-output-dir "~/my_awesome_directory/" app.kt
+```
+
+This command is equivalent of:
+```bash
+kotlinc-native -language-version 2.0 app.kt -Xswift-export-run -Xcompiler-plugin=$PLUGIN_PATH=output_dir="~/my_awesome_directory/" -p library
 ```
 
 This will produce the following file tree:
@@ -52,13 +57,13 @@ This will produce the following file tree:
 
 ### How to generate tests:
 ```bash
-./gradlew :generators:sir-tests-generator:generateTests
+./gradlew :generators:sir-native-tests-generator:generateTests
 ```
 this will generate tests from the input files. The input files can be found and should be placed here: `plugins/swift-export/testData`
 
 The test expects to find the `.golden.swift`, `.golden.kt` and `.golden.h` files that contain the resulting bridges. The name of the `.golden.*` file should be the same as the name of the corresponding `.kt` file.
 
-The project for the generator can be found here — `generators/sir-tests-generator/build.gradle.kts`
+The project for the generator can be found here — `generators/sir-native-tests-generator/build.gradle.kts`
 
 ### How to run the tests:
 ```bash

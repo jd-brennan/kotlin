@@ -44,6 +44,16 @@ while [ $# -gt 0 ]; do
       TIMECMD=time
       shift
       ;;
+    --swift-export-plugin-path)
+      PATH_TO_SWIFT_EXPORT_PLUGIN=$2
+      shift
+      shift
+      ;;
+    --swift-export-output-dir)
+      REQUESTED_OUTPUT_PATH=$2
+      shift
+      shift
+      ;;
      *)
       konan_args[${#konan_args[@]}]=$1
       shift
@@ -78,6 +88,15 @@ KONAN_JAR="${KONAN_HOME}/konan/lib/kotlin-native-compiler-embeddable.jar"
 TROVE_JAR="${KONAN_HOME}/konan/lib/trove4j.jar"
 KONAN_CLASSPATH="$KONAN_JAR:$TROVE_JAR"
 TOOL_CLASS=org.jetbrains.kotlin.cli.utilities.MainKt
+
+if [[ "$TOOL_NAME" == "swift-export" ]]
+then
+  TOOL_NAME="konanc"
+  konan_args=("${konan_args[@]}" -Xswift-export-run)
+  konan_args=("${konan_args[@]}" -language-version 2.0)
+  konan_args=("${konan_args[@]}" -Xcompiler-plugin=$PATH_TO_SWIFT_EXPORT_PLUGIN=output_dir=$REQUESTED_OUTPUT_PATH)
+  konan_args=("${konan_args[@]}" -p library)
+fi
+
 LIBCLANG_DISABLE_CRASH_RECOVERY=1 \
 $TIMECMD "$JAVACMD" "${java_opts[@]}" "${java_args[@]}" -cp "$KONAN_CLASSPATH" "$TOOL_CLASS" "$TOOL_NAME" "${konan_args[@]}"
-
