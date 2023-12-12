@@ -1,3 +1,8 @@
+// KT-64271
+// IGNORE_BACKEND_K2: NATIVE
+// IGNORE_BACKEND_K2: WASM
+// IGNORE_BACKEND_K2: JS, JS_IR, JS_IR_ES6
+
 typealias Some = (Any) -> String?
 
 object Factory {
