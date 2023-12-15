@@ -26,6 +26,7 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteIfExists
+import kotlin.io.path.readLines
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -366,10 +367,23 @@ class GeneralNativeIT : KGPBaseTest() {
     fun testGenerateLLDBInitFile(gradleVersion: GradleVersion) {
         nativeProject("native-binaries/frameworks", gradleVersion = gradleVersion) {
             val lldbPath = projectPath.resolve("lldbinit")
+
             build(":setupLLDBScript") {
                 assertFileInProjectExists(lldbPath.absolutePathString())
                 assertFileContains(lldbPath, "command script import")
                 assertFileContains(lldbPath, "konan_lldb.py")
+
+                val scriptContent = lldbPath.readLines()
+                assert(scriptContent.size == 1) {
+                    "lldbinit file contains more than 1 line or doesn't contains lines at all"
+                }
+
+                val scriptPath = scriptContent
+                    .first()
+                    .replace("command script import", "")
+                    .trimIndent()
+
+                assertFileInProjectExists(scriptPath)
             }
         }
     }
