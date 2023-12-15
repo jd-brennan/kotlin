@@ -4,11 +4,14 @@ import org.jetbrains.kotlin.backend.common.serialization.CompatibilityMode
 import org.jetbrains.kotlin.backend.common.serialization.IrModuleSerializer
 import org.jetbrains.kotlin.backend.konan.ir.interop.IrProviderForCEnumAndCStructStubs
 import org.jetbrains.kotlin.config.LanguageVersionSettings
+import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.ir.IrBuiltIns
+import org.jetbrains.kotlin.ir.IrDiagnosticReporter
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
 
 class KonanIrModuleSerializer(
+        diagnosticReporter: IrDiagnosticReporter,
         messageLogger: IrMessageLogger,
         irBuiltIns: IrBuiltIns,
         compatibilityMode: CompatibilityMode,
@@ -17,9 +20,17 @@ class KonanIrModuleSerializer(
         private val languageVersionSettings: LanguageVersionSettings,
         private val bodiesOnlyForInlines: Boolean = false,
         private val skipPrivateApi: Boolean = false,
-) : IrModuleSerializer<KonanIrFileSerializer>(messageLogger, compatibilityMode, normalizeAbsolutePaths, sourceBaseDirs) {
+        shouldCheckSignaturesOnUniqueness: Boolean = true,
+) : IrModuleSerializer<KonanIrFileSerializer>(
+        diagnosticReporter,
+        messageLogger,
+        compatibilityMode,
+        normalizeAbsolutePaths,
+        sourceBaseDirs,
+        shouldCheckSignaturesOnUniqueness,
+) {
 
-    private val globalDeclarationTable = KonanGlobalDeclarationTable(irBuiltIns)
+    override val globalDeclarationTable = KonanGlobalDeclarationTable(irBuiltIns)
 
     // We skip files with IR for C structs and enums because they should be
     // generated anew.

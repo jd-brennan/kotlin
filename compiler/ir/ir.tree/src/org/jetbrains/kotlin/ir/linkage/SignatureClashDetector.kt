@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.ir.linkage
 
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory1
 import org.jetbrains.kotlin.ir.IrDiagnosticReporter
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.isFakeOverride
@@ -91,7 +92,7 @@ abstract class SignatureClashDetector<Signature : Any, Declaration : IrDeclarati
         diagnosticFactory: KtDiagnosticFactory1<Data>,
         declarations: Collection<ConflictingDeclaration>,
         data: Data,
-        reportOnIfSynthetic: (ConflictingDeclaration) -> IrDeclaration,
+        reportOnIfSynthetic: (ConflictingDeclaration) -> IrElement,
     ) {
         declarations.mapTo(LinkedHashSet()) { declaration ->
             val reportOn = declaration.takeUnless { it.startOffset < 0 } ?: reportOnIfSynthetic(declaration)

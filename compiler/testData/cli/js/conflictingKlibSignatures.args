@@ -1,0 +1,10 @@
+$TESTDATA_DIR$/conflictingKlibSignatures.kt
+-language-version
+2.0
+-Xir-produce-klib-dir
+-ir-output-dir
+$TEMP_DIR$
+-ir-output-name
+conflictingKlibSignatures.kt
+-libraries
+libraries/stdlib/build/classes/kotlin/js/main

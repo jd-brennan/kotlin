@@ -647,7 +647,7 @@ fun serializeModuleIntoKlib(
     val compatibilityMode = CompatibilityMode(abiVersion)
     val sourceBaseDirs = configuration[CommonConfigurationKeys.KLIB_RELATIVE_PATH_BASES] ?: emptyList()
     val absolutePathNormalization = configuration[CommonConfigurationKeys.KLIB_NORMALIZE_ABSOLUTE_PATH] ?: false
-    val signatureClashChecks = configuration[CommonConfigurationKeys.PRODUCE_KLIB_SIGNATURES_CLASH_CHECKS] ?: false
+    val signatureClashChecks = configuration[CommonConfigurationKeys.PRODUCE_KLIB_SIGNATURES_CLASH_CHECKS] ?: true
 
     val moduleExportedNames = moduleFragment.collectExportedNames()
 
@@ -659,6 +659,7 @@ fun serializeModuleIntoKlib(
 
     val serializedIr =
         JsIrModuleSerializer(
+            irDiagnosticReporter,
             messageLogger,
             moduleFragment.irBuiltins,
             compatibilityMode,
@@ -666,8 +667,7 @@ fun serializeModuleIntoKlib(
             sourceBaseDirs = sourceBaseDirs,
             configuration.languageVersionSettings,
             signatureClashChecks,
-            jsIrFileMetadataFactory = { JsIrFileMetadata(moduleExportedNames[it]?.values?.toSmartList() ?: emptyList()) }
-        ).serializedIrModule(moduleFragment)
+        ) { JsIrFileMetadata(moduleExportedNames[it]?.values?.toSmartList() ?: emptyList()) }.serializedIrModule(moduleFragment)
 
     val moduleDescriptor = moduleFragment.descriptor
 

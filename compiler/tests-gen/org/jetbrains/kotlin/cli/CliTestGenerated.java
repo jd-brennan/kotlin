@@ -1298,6 +1298,11 @@ public class CliTestGenerated extends AbstractCliTest {
             runTest("compiler/testData/cli/js/compilationErrorK2.args");
         }
 
+        @TestMetadata("conflictingKlibSignatures.args")
+        public void testConflictingKlibSignatures() throws Exception {
+            runTest("compiler/testData/cli/js/conflictingKlibSignatures.args");
+        }
+
         @TestMetadata("createMetadata.args")
         public void testCreateMetadata() throws Exception {
             runTest("compiler/testData/cli/js/createMetadata.args");

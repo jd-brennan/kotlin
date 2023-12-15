@@ -1,0 +1,11 @@
+compiler/testData/cli/js/conflictingKlibSignatures.kt:4:5: error: platform declaration clash: The following declarations have the same KLIB signature (com.example.klib.serialization.diagnostics/A.foo|foo(){}[0]):
+    fun foo(): String defined in com.example.klib.serialization.diagnostics.A
+    fun foo(): Int defined in com.example.klib.serialization.diagnostics.A
+    @Deprecated("", level = DeprecationLevel.HIDDEN)
+    ^
+compiler/testData/cli/js/conflictingKlibSignatures.kt:7:5: error: platform declaration clash: The following declarations have the same KLIB signature (com.example.klib.serialization.diagnostics/A.foo|foo(){}[0]):
+    fun foo(): String defined in com.example.klib.serialization.diagnostics.A
+    fun foo(): Int defined in com.example.klib.serialization.diagnostics.A
+    fun foo(): Int = 0
+    ^
+COMPILATION_ERROR
