@@ -517,7 +517,7 @@ TEST(ObjectFactoryStorageTest, Pop) {
 
     EXPECT_THAT(actual, testing::IsEmpty());
     EXPECT_THAT(actualConsumer, testing::IsEmpty());
-    EXPECT_THAT(popped, testing::ElementsAre(3, 2, 1));
+    EXPECT_THAT(popped, testing::ElementsAre(1, 2, 3));
     EXPECT_THAT(storage.GetSizeUnsafe(), 0);
     EXPECT_THAT(producer.size(), 0);
     EXPECT_THAT(consumer.size(), 0);

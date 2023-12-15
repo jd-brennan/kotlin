@@ -329,6 +329,7 @@ public:
             AssertCorrect();
             auto result = std::move(root_);
             if (result) {
+                --size_;
                 root_ = std::move(result->next_);
                 if (last_ == result.get()) {
                     last_ = nullptr;
