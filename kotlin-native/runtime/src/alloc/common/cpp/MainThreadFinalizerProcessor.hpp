@@ -12,6 +12,11 @@
 
 namespace kotlin::alloc {
 
+// Finalizer processor that runs on the main thread.
+//
+// Only enabled if `compiler::objcDisposeOnMain()` is true and if the main run loop is processed.
+//
+// It just wraps `RunLoopFinalizerProcessor`, see it for implementation details.
 template <typename FinalizerQueue, typename FinalizerQueueTraits>
 class MainThreadFinalizerProcessor : private Pinned {
 public:
