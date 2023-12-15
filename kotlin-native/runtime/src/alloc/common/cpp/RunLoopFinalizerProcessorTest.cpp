@@ -23,9 +23,7 @@ struct FinalizerQueueTraits {
         into.insert(into.end(), std::make_move_iterator(from.begin()), std::make_move_iterator(from.end()));
     }
 
-    static bool isEmpty(const FinalizerQueue& queue) noexcept {
-        return queue.empty();
-    }
+    static bool isEmpty(const FinalizerQueue& queue) noexcept { return queue.empty(); }
 
     static bool processSingle(FinalizerQueue& queue) noexcept {
         if (queue.empty()) return false;
@@ -116,7 +114,8 @@ TEST(RunLoopFinalizerProcessorTest, Overtime) {
         });
     }
     processor.schedule(
-            {finalizers[0].AsStdFunction(), finalizers[1].AsStdFunction(), finalizers[2].AsStdFunction(), finalizers[3].AsStdFunction()}, 1);
+            {finalizers[0].AsStdFunction(), finalizers[1].AsStdFunction(), finalizers[2].AsStdFunction(), finalizers[3].AsStdFunction()},
+            1);
     runLoop.wakeUp();
 
     while (!done.load(std::memory_order_acquire)) {
@@ -156,7 +155,8 @@ TEST(RunLoopFinalizerProcessorTest, ScheduleWhileOvertime) {
         EXPECT_CALL(finalizers[4], Call()).WillOnce([&] { done.store(true, std::memory_order_release); });
     }
     processor.schedule(
-            {finalizers[0].AsStdFunction(), finalizers[1].AsStdFunction(), finalizers[2].AsStdFunction(), finalizers[3].AsStdFunction()}, 1);
+            {finalizers[0].AsStdFunction(), finalizers[1].AsStdFunction(), finalizers[2].AsStdFunction(), finalizers[3].AsStdFunction()},
+            1);
     runLoop.wakeUp();
 
     while (!done.load(std::memory_order_acquire)) {
