@@ -44,10 +44,7 @@ public:
         }
     }
 
-    T* GetPage(
-            uint32_t cellCount,
-            FinalizerQueue& finalizerQueue,
-            std::atomic<std::size_t>& concurrentSweepersCount_) noexcept {
+    T* GetPage(uint32_t cellCount, FinalizerQueue& finalizerQueue, std::atomic<std::size_t>& concurrentSweepersCount_) noexcept {
         T* page;
         if ((page = ready_.Pop())) {
             used_.Push(page);
@@ -99,12 +96,7 @@ public:
 private:
     friend class Heap;
 
-    T* SweepSingle(
-            GCSweepScope& sweepHandle,
-            T* page,
-            AtomicStack<T>& from,
-            AtomicStack<T>& to,
-            FinalizerQueue& finalizerQueue) noexcept {
+    T* SweepSingle(GCSweepScope& sweepHandle, T* page, AtomicStack<T>& from, AtomicStack<T>& to, FinalizerQueue& finalizerQueue) noexcept {
         if (!page) {
             return nullptr;
         }

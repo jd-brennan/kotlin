@@ -35,8 +35,7 @@ public:
     }
 
     void schedule(FinalizerQueue tasks, uint64_t epoch) noexcept {
-        if (FinalizerQueueTraits::isEmpty(tasks))
-            return;
+        if (FinalizerQueueTraits::isEmpty(tasks)) return;
 #if KONAN_HAS_FOUNDATION_FRAMEWORK
         RuntimeAssert(available(), "MainThreadFinalizerProcessor is unavailable");
         processor_.schedule(std::move(tasks), epoch);

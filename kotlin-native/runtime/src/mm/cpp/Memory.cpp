@@ -442,9 +442,8 @@ extern "C" KLong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorMaxTim
 }
 
 extern "C" void Kotlin_native_internal_GC_setMainThreadFinalizerProcessorMaxTimeInTask(ObjHeader* gc, KLong value) {
-    mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor([=](auto& config) noexcept -> void {
-        config.maxTimeInTask = std::chrono::microseconds(value);
-    });
+    mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor(
+            [=](auto& config) noexcept -> void { config.maxTimeInTask = std::chrono::microseconds(value); });
 }
 
 extern "C" KLong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorMinTimeBetweenTasks(ObjHeader* gc) {
@@ -456,23 +455,19 @@ extern "C" KLong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorMinTim
 }
 
 extern "C" void Kotlin_native_internal_GC_setMainThreadFinalizerProcessorMinTimeBetweenTasks(ObjHeader* gc, KLong value) {
-    mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor([=](auto& config) noexcept -> void {
-        config.minTimeBetweenTasks = std::chrono::microseconds(value);
-    });
+    mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor(
+            [=](auto& config) noexcept -> void { config.minTimeBetweenTasks = std::chrono::microseconds(value); });
 }
 
 extern "C" KULong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorBatchSize(ObjHeader* gc) {
     KULong result;
-    mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor([&](auto& config) noexcept -> void {
-        result = config.batchSize;
-    });
+    mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor(
+            [&](auto& config) noexcept -> void { result = config.batchSize; });
     return result;
 }
 
 extern "C" void Kotlin_native_internal_GC_setMainThreadFinalizerProcessorBatchSize(ObjHeader* gc, KULong value) {
-    mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor([=](auto& config) noexcept -> void {
-        config.batchSize = value;
-    });
+    mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor([=](auto& config) noexcept -> void { config.batchSize = value; });
 }
 
 extern "C" bool Kotlin_Any_isShareable(ObjHeader* thiz) {
