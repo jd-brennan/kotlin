@@ -81,6 +81,10 @@ void gc::GC::configureMainThreadFinalizerProcessor(std::function<void(alloc::Run
     impl_->gc().mainThreadFinalizerProcessor().withConfig(std::move(f));
 }
 
+bool gc::GC::mainThreadFinalizerProcessorAvailable() noexcept {
+    return impl_->gc().mainThreadFinalizerProcessor().available();
+}
+
 ALWAYS_INLINE void gc::beforeHeapRefUpdate(mm::DirectRefAccessor ref, ObjHeader* value) noexcept {}
 
 ALWAYS_INLINE OBJ_GETTER(gc::weakRefReadBarrier, std::atomic<ObjHeader*>& weakReferee) noexcept {

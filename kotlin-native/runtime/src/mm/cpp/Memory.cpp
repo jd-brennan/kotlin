@@ -433,7 +433,11 @@ extern "C" void Kotlin_native_internal_GC_setCyclicCollector(ObjHeader* gc, bool
     // Nothing to do.
 }
 
-extern "C" KLong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorMaxTimeInTask(ObjHeader* gc) {
+extern "C" KBoolean Kotlin_native_runtime_GC_MainThreadFinalizerProcessor_isAvailable(ObjHeader* gc) {
+    return mm::GlobalData::Instance().gc().mainThreadFinalizerProcessorAvailable();
+}
+
+extern "C" KLong Kotlin_native_runtime_GC_MainThreadFinalizerProcessor_getMaxTimeInTask(ObjHeader* gc) {
     KLong result;
     mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor([&](auto& config) noexcept -> void {
         result = std::chrono::duration_cast<std::chrono::microseconds>(config.maxTimeInTask).count();
@@ -441,12 +445,12 @@ extern "C" KLong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorMaxTim
     return result;
 }
 
-extern "C" void Kotlin_native_internal_GC_setMainThreadFinalizerProcessorMaxTimeInTask(ObjHeader* gc, KLong value) {
+extern "C" void Kotlin_native_runtime_GC_MainThreadFinalizerProcessor_setMaxTimeInTask(ObjHeader* gc, KLong value) {
     mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor(
             [=](auto& config) noexcept -> void { config.maxTimeInTask = std::chrono::microseconds(value); });
 }
 
-extern "C" KLong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorMinTimeBetweenTasks(ObjHeader* gc) {
+extern "C" KLong Kotlin_native_runtime_GC_MainThreadFinalizerProcessor_getMinTimeBetweenTasks(ObjHeader* gc) {
     KLong result;
     mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor([&](auto& config) noexcept -> void {
         result = std::chrono::duration_cast<std::chrono::microseconds>(config.minTimeBetweenTasks).count();
@@ -454,19 +458,19 @@ extern "C" KLong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorMinTim
     return result;
 }
 
-extern "C" void Kotlin_native_internal_GC_setMainThreadFinalizerProcessorMinTimeBetweenTasks(ObjHeader* gc, KLong value) {
+extern "C" void Kotlin_native_runtime_GC_MainThreadFinalizerProcessor_setMinTimeBetweenTasks(ObjHeader* gc, KLong value) {
     mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor(
             [=](auto& config) noexcept -> void { config.minTimeBetweenTasks = std::chrono::microseconds(value); });
 }
 
-extern "C" KULong Kotlin_native_internal_GC_getMainThreadFinalizerProcessorBatchSize(ObjHeader* gc) {
+extern "C" KULong Kotlin_native_runtime_GC_MainThreadFinalizerProcessor_getBatchSize(ObjHeader* gc) {
     KULong result;
     mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor(
             [&](auto& config) noexcept -> void { result = config.batchSize; });
     return result;
 }
 
-extern "C" void Kotlin_native_internal_GC_setMainThreadFinalizerProcessorBatchSize(ObjHeader* gc, KULong value) {
+extern "C" void Kotlin_native_runtime_GC_MainThreadFinalizerProcessor_setBatchSize(ObjHeader* gc, KULong value) {
     mm::GlobalData::Instance().gc().configureMainThreadFinalizerProcessor([=](auto& config) noexcept -> void { config.batchSize = value; });
 }
 

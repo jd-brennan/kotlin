@@ -81,6 +81,7 @@ public:
     void WaitFinalizers(int64_t epoch) noexcept;
 
     void configureMainThreadFinalizerProcessor(std::function<void(alloc::RunLoopFinalizerProcessorConfig&)> f) noexcept;
+    bool mainThreadFinalizerProcessorAvailable() noexcept;
 
 private:
     std::unique_ptr<Impl> impl_;

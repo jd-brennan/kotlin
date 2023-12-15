@@ -18,6 +18,8 @@
 
 namespace kotlin::alloc {
 
+// Configuration for `RunLoopFinalizerProcessor`
+// When updating the default values, do not forget to update stdlib API docs.
 struct RunLoopFinalizerProcessorConfig {
     // How long can finalizers be processed in a single task. If some finalizer takes too long, the entire
     // batch of `batchSize` will overshoot this target.
