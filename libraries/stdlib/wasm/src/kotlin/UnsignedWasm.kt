@@ -93,7 +93,7 @@ internal actual fun uintToString(value: Int, base: Int): String {
     var currentBufferIndex = UInt.SIZE_BITS - 1
 
     while (unsignedValue != 0U) {
-        buffer.set(currentBufferIndex, (unsignedValue % ulongRadix).toLong().getChar())
+        buffer.set(currentBufferIndex, (unsignedValue % ulongRadix).toInt().getChar())
         unsignedValue /= ulongRadix
         currentBufferIndex--
     }
@@ -110,7 +110,7 @@ internal actual fun ulongToString(value: Long, base: Int): String {
     var unsignedValue = value.toULong()
 
     if (base == 10) return unsignedValue.toString()
-    if (value in 0 until base) return value.getChar().toString()
+    if (value in 0 until base) return value.toInt().getChar().toString()
 
     val buffer = WasmCharArray(ULong.SIZE_BITS)
 
@@ -118,7 +118,7 @@ internal actual fun ulongToString(value: Long, base: Int): String {
     var currentBufferIndex = ULong.SIZE_BITS - 1
 
     while (unsignedValue != 0UL) {
-        buffer.set(currentBufferIndex, (unsignedValue % ulongRadix).toLong().getChar())
+        buffer.set(currentBufferIndex, (unsignedValue % ulongRadix).toInt().getChar())
         unsignedValue /= ulongRadix
         currentBufferIndex--
     }
@@ -135,5 +135,4 @@ internal fun WasmCharArray.createStringStartingFrom(index: Int): String {
     return newChars.createString()
 }
 
-internal fun Number.getChar() = toInt().let { if (it < 10) '0' + it else 'a' + (it - 10) }
-
+private fun Int.getChar() = if (this < 10) '0' + this else 'a' + (this - 10)

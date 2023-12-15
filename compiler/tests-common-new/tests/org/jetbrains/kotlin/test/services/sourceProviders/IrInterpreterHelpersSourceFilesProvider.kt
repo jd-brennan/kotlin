@@ -19,7 +19,7 @@ class IrInterpreterHelpersSourceFilesProvider(testServices: TestServices) : Addi
         private const val HELPERS_PATH = "./compiler/testData/ir/interpreter/helpers"
         private val UNSIGNED_PATH = arrayOf(
             "./libraries/stdlib/unsigned/src/kotlin",
-            "./libraries/stdlib/jvm/src/kotlin/UnsignedJVM.kt"
+            "./libraries/stdlib/jvm/src/kotlin/util/UnsignedJVM.kt"
         )
         private val RUNTIME_PATHS = arrayOf(
             "./libraries/stdlib/src/kotlin/ranges/Progressions.kt",
