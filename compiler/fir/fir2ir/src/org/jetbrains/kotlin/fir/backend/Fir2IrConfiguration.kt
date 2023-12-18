@@ -99,7 +99,7 @@ class Fir2IrConfiguration private constructor(
         fun forKlibCompilation(
             compilerConfiguration: CompilerConfiguration,
             diagnosticReporter: DiagnosticReporter,
-            linkViaSignatures: Boolean = false, // FIXME: This is for irText tests only, we need to remove this parameter (KT-*****)
+            linkViaSignatures: Boolean = false,
         ): Fir2IrConfiguration =
             fromCompilerConfiguration(
                 compilerConfiguration,

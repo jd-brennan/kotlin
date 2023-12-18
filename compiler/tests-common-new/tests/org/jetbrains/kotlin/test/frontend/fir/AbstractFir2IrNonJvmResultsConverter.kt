@@ -85,7 +85,7 @@ abstract class AbstractFir2IrNonJvmResultsConverter(
         val fir2IrConfiguration = Fir2IrConfiguration.forKlibCompilation(
             compilerConfiguration,
             diagnosticReporter,
-            linkViaSignatures = LanguageSettingsDirectives.LINK_VIA_SIGNATURES in module.directives, // FIXME: Should always be false (KT-*****)
+            linkViaSignatures = LanguageSettingsDirectives.LINK_VIA_SIGNATURES in module.directives,
         )
         val fir2irResult = inputArtifact.toFirResult().convertToIrAndActualize(
             Fir2IrExtensions.Default,
