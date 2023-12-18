@@ -69,7 +69,7 @@ the Kotlin IntelliJ IDEA plugin:
       - License: Apache 2 ([license/third_party/guava_license.txt][guava])
       - Origin: Derived from Guava's UnsignedLongs, (C) 2011 The Guava Authors
 
- - Path: libraries/stdlib/jvm/src/kotlin/UnsignedJVM.kt
+ - Path: libraries/stdlib/jvm/src/kotlin/util/UnsignedJVM.kt
       - License: Apache 2 ([license/third_party/guava_license.txt][guava])
       - Origin: Derived from Guava's UnsignedLongs, (C) 2011 The Guava Authors
 
