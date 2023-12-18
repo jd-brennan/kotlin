@@ -177,15 +177,17 @@ private fun buildResultingTypeAndAdaptation(
             ) to callableReferenceAdaptation
         }
         is FirVariable -> {
-            var returnType = returnTypeRef.type
-            if (returnType.hasCapture()) {
-                val approximated = context.inferenceComponents.resultTypeResolver.typeApproximator
-                    .approximateToSuperType(returnType, TypeApproximatorConfiguration.InternalTypesApproximation) as? ConeKotlinType
-                if (approximated != null) {
-                    returnType = approximated
-                }
+            val returnType = returnTypeRef.type
+            val isMutable = fir.canBeMutableReference(candidate)
+            val propertyType = when {
+                isMutable && returnType.hasCapture() ->
+                    // capturing types in mutable property references is unsound in general
+                    context.inferenceComponents.resultTypeResolver.typeApproximator
+                        .approximateToSuperType(returnType, TypeApproximatorConfiguration.InternalTypesApproximation) as? ConeKotlinType
+                        ?: returnType
+                else -> returnType
             }
-            createKPropertyType(fir, receiverType, returnType, candidate) to null
+            createKPropertyType(receiverType, propertyType, isMutable) to null
         }
         else -> ConeErrorType(ConeUnsupportedCallableReferenceTarget(candidate)) to null
     }
@@ -492,17 +494,6 @@ class FirFakeArgumentForCallableReference(
 fun ConeKotlinType.isKCallableType(): Boolean {
     return this.classId == StandardClassIds.KCallable
 }
-
-private fun createKPropertyType(
-    propertyOrField: FirVariable,
-    receiverType: ConeKotlinType?,
-    propertyType: ConeKotlinType,
-    candidate: Candidate,
-): ConeKotlinType = createKPropertyType(
-    receiverType,
-    propertyType,
-    isMutable = propertyOrField.canBeMutableReference(candidate)
-)
 
 private fun FirVariable.canBeMutableReference(candidate: Candidate): Boolean {
     if (!isVar) return false
