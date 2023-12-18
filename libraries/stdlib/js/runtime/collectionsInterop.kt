@@ -5,11 +5,13 @@
 
 package kotlin.collections
 
-private class JsArrayView<E> : JsMutableArray<E>()
+import kotlin.js.collections.*
+
+private class JsArrayView<E> : JsArray<E>()
 
 private fun UNSUPPORTED_OPERATION() { throw UnsupportedOperationException() }
 
-internal fun <E> createJsArrayImmutableViewFrom(list: List<E>): JsImmutableArray<E> =
+internal fun <E> createJsArrayImmutableViewFrom(list: List<E>): JsReadonlyArray<E> =
     createJsArrayMutableViewWith(
         listSize = { list.size },
         listGet = { i -> list[i] },
@@ -18,7 +20,7 @@ internal fun <E> createJsArrayImmutableViewFrom(list: List<E>): JsImmutableArray
         listDecreaseSize = ::UNSUPPORTED_OPERATION.asDynamic()
     )
 
-internal fun <E> createJsArrayMutableViewFrom(list: MutableList<E>): JsMutableArray<E> =
+internal fun <E> createJsArrayMutableViewFrom(list: MutableList<E>): JsArray<E> =
     createJsArrayMutableViewWith(
         listSize = { list.size },
         listGet = { i -> list[i] },
@@ -60,9 +62,9 @@ private fun <E> createJsArrayMutableViewWith(
     """)
 }
 
-private class JsSetView<E> : JsMutableSet<E>()
+private class JsSetView<E> : JsSet<E>()
 
-internal fun <E> createJsSetImmutableViewFrom(set: Set<E>): JsImmutableSet<E> =
+internal fun <E> createJsSetImmutableViewFrom(set: Set<E>): JsReadonlySet<E> =
     createJsSetImmutableViewWith<E>(
         setSize = { set.size },
         setAdd = ::UNSUPPORTED_OPERATION.asDynamic(),
@@ -74,7 +76,7 @@ internal fun <E> createJsSetImmutableViewFrom(set: Set<E>): JsImmutableSet<E> =
         forEach = { cb, t -> forEach(cb, t ?: set) }
     )
 
-internal fun <E> createJsSetMutableViewFrom(set: MutableSet<E>): JsMutableSet<E> =
+internal fun <E> createJsSetMutableViewFrom(set: MutableSet<E>): JsSet<E> =
     createJsSetImmutableViewWith<E>(
         setSize = { set.size },
         setAdd = { v -> set.add(v) },
@@ -117,9 +119,9 @@ private fun <E> createJsSetImmutableViewWith(
 }
 
 
-private class JsMapView<K, V> : JsMutableMap<K, V>()
+private class JsMapView<K, V> : JsMap<K, V>()
 
-internal fun <K, V> createJsMapImmutableViewFrom(map: Map<K, V>): JsImmutableMap<K, V> =
+internal fun <K, V> createJsMapImmutableViewFrom(map: Map<K, V>): JsReadonlyMap<K, V> =
     createJsMapImmutableViewWith<K, V>(
         mapSize = { map.size },
         mapGet = { k -> map[k] },
@@ -133,7 +135,7 @@ internal fun <K, V> createJsMapImmutableViewFrom(map: Map<K, V>): JsImmutableMap
         forEach = { cb, t -> forEach(cb, t ?: map) }
     )
 
-internal fun <K, V> createJsMapMutableViewFrom(map: MutableMap<K, V>): JsMutableMap<K, V> =
+internal fun <K, V> createJsMapMutableViewFrom(map: MutableMap<K, V>): JsMap<K, V> =
     createJsMapImmutableViewWith<K, V>(
         mapSize = { map.size },
         mapGet = { k -> map[k] },

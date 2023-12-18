@@ -29,6 +29,8 @@
 
 package kotlin.collections
 
+import kotlin.js.collections.*
+
 /**
  * Classes that inherit from this interface can be represented as a sequence of elements that can
  * be iterated over.
@@ -196,8 +198,12 @@ public interface List<out E> : Collection<E> {
      */
     public fun subList(fromIndex: Int, toIndex: Int): List<E>
 
+    /**
+     * Returns a view with the [JsReadonlyArray] methods to consume it in JavaScript as a regular readonly array
+     * Structural changes in the base list are synchronized with the view
+     */
     @ExperimentalJsExport
-    public fun asJsArrayView(): JsImmutableArray<E> = createJsArrayImmutableViewFrom(this)
+    public fun asJsArrayView(): JsReadonlyArray<E> = createJsArrayImmutableViewFrom(this)
 }
 
 /**
@@ -266,8 +272,12 @@ public interface MutableList<E> : List<E>, MutableCollection<E> {
     // View
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<E>
 
+    /**
+     * Returns a view with the [JsArray] methods to consume it in JavaScript as a regular array
+     * Structural changes in the base list are synchronized with the view, and vice verse
+     */
     @ExperimentalJsExport
-    public fun asJsArrayMutableView(): JsMutableArray<E> = createJsArrayMutableViewFrom(this)
+    public fun asJsArrayMutableView(): JsArray<E> = createJsArrayMutableViewFrom(this)
 }
 
 /**
@@ -290,8 +300,12 @@ public interface Set<out E> : Collection<E> {
     // Bulk Operations
     override fun containsAll(elements: Collection<@UnsafeVariance E>): Boolean
 
+    /**
+     * Returns a view with the [JsReadonlySet] methods to consume it in JavaScript as a regular readonly Set
+     * Structural changes in the base list are synchronized with the view
+     */
     @ExperimentalJsExport
-    public fun asJsSetView(): JsImmutableSet<E> = createJsSetImmutableViewFrom(this)
+    public fun asJsSetView(): JsReadonlySet<E> = createJsSetImmutableViewFrom(this)
 }
 
 /**
@@ -324,8 +338,12 @@ public interface MutableSet<E> : Set<E>, MutableCollection<E> {
 
     override fun clear(): Unit
 
+    /**
+     * Returns a view with the [JsSet] methods to consume it in JavaScript as a regular Set
+     * Structural changes in the base list are synchronized with the view, and vice verse
+     */
     @ExperimentalJsExport
-    public fun asJsSetMutableView(): JsMutableSet<E> = createJsSetMutableViewFrom(this)
+    public fun asJsSetMutableView(): JsSet<E> = createJsSetMutableViewFrom(this)
 }
 
 /**
@@ -395,8 +413,12 @@ public interface Map<K, out V> {
         public val value: V
     }
 
+    /**
+     * Returns a view with the [JsReadonlyMap] methods to consume it in JavaScript as a regular readonly Map
+     * Structural changes in the base list are synchronized with the view
+     */
     @ExperimentalJsExport
-    public fun asJsMapView(): JsImmutableMap<K, V> = createJsMapImmutableViewFrom(this)
+    public fun asJsMapView(): JsReadonlyMap<K, V> = createJsMapImmutableViewFrom(this)
 }
 
 /**
@@ -460,6 +482,10 @@ public interface MutableMap<K, V> : Map<K, V> {
         public fun setValue(newValue: V): V
     }
 
+    /**
+     * Returns a view with the [JsMap] methods to consume it in JavaScript as a regular Map
+     * Structural changes in the base list are synchronized with the view, and vice verse
+     */
     @ExperimentalJsExport
-    public fun asJsMapMutableView(): JsMutableMap<K, V> = createJsMapMutableViewFrom(this)
+    public fun asJsMapMutableView(): JsMap<K, V> = createJsMapMutableViewFrom(this)
 }
