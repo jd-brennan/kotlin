@@ -4,7 +4,7 @@
   <groupId>org.jetbrains.kotlin</groupId>
   <artifactId>kotlinx-jso-compiler-plugin</artifactId>
   <version>ArtifactsTest.version</version>
-  <name>Kotlin JavaScript Object Compiler Plugin</name>
+  <name>Kotlinx Jso Compiler Plugin</name>
   <description>JavaScript Object Compiler Plugin</description>
   <url>https://kotlinlang.org/</url>
   <licenses>

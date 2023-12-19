@@ -4,8 +4,8 @@
   <groupId>org.jetbrains.kotlin</groupId>
   <artifactId>kotlinx-jso-compiler-plugin-embeddable</artifactId>
   <version>ArtifactsTest.version</version>
-  <name>Kotlin JavaScript Object Compiler Plugin Embeddable</name>
-  <description>Kotlin JavaScript Object Compiler Plugin Embeddable</description>
+  <name>Kotlinx Jso Compiler Plugin Embeddable</name>
+  <description>Kotlinx Jso Compiler Plugin Embeddable</description>
   <url>https://kotlinlang.org/</url>
   <licenses>
     <license>
