@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlinx.jso.compiler.fir
 
+import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
@@ -41,11 +42,13 @@ import org.jetbrains.kotlin.fir.types.isNullable
 import org.jetbrains.kotlin.fir.types.toFirResolvedTypeRef
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.name.StandardClassIds
 import org.jetbrains.kotlin.types.ConstantValueKind
+import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlin.utils.addToStdlib.runIf
 import org.jetbrains.kotlinx.jso.compiler.fir.services.jsObjectPropertiesProvider
 import org.jetbrains.kotlinx.jso.compiler.resolve.JsSimpleObjectPluginKey
-import org.jetbrains.kotlinx.jso.compiler.resolve.SpecialNames
 
 /**
  * The extension generate a synthetic factory and copy-method for an `external interface` annotated with @JsSimpleObject
@@ -103,7 +106,7 @@ class JsObjectFunctionsGenerator(session: FirSession) : FirDeclarationGeneration
         return if (
             owner is FirRegularClassSymbol &&
             owner.isJsObject &&
-            name == SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT
+            name == org.jetbrains.kotlin.name.SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT
         ) generateCompanionDeclaration(owner)
         else null
     }
@@ -133,8 +136,8 @@ class JsObjectFunctionsGenerator(session: FirSession) : FirDeclarationGeneration
     override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> {
         val outerClass = classSymbol.getContainingClassSymbol(session)
         return when {
-            classSymbol.isCompanion && outerClass?.isJsObject == true -> setOf(SpecialNames.INVOKE_OPERATOR_NAME)
-            classSymbol.isJsObject -> setOf(SpecialNames.COPY_METHOD_NAME)
+            classSymbol.isCompanion && outerClass?.isJsObject == true -> setOf(OperatorNameConventions.INVOKE)
+            classSymbol.isJsObject -> setOf(StandardNames.DATA_CLASS_COPY)
             else -> emptySet()
         }
     }
@@ -146,12 +149,12 @@ class JsObjectFunctionsGenerator(session: FirSession) : FirDeclarationGeneration
         val possibleInterface = containingClass?.outerClassId
 
         return when (callableId.callableName) {
-            SpecialNames.COPY_METHOD_NAME -> {
+            StandardNames.DATA_CLASS_COPY -> {
                 containingClass
                     ?.let { factoryFqNamesToJsObjectInterface[it.asSingleFqName()] }
                     ?.let { listOf(createJsObjectCopyFunction(callableId, context.owner, it).symbol) } ?: emptyList()
             }
-            SpecialNames.INVOKE_OPERATOR_NAME -> {
+            OperatorNameConventions.INVOKE -> {
                 possibleInterface
                     ?.takeIf { context.owner.isCompanion }
                     ?.let { factoryFqNamesToJsObjectInterface[it.asSingleFqName()] }

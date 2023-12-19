@@ -19,9 +19,3 @@ object JsObjectAnnotations {
     val jsSimpleObjectAnnotationClassId = ClassId(FqName("kotlinx.jso"), Name.identifier("JsSimpleObject"))
     val jsSimpleObjectAnnotationFqName = jsSimpleObjectAnnotationClassId.asSingleFqName()
 }
-
-object SpecialNames {
-    val DEFAULT_NAME_FOR_COMPANION_OBJECT = Name.identifier("Companion")
-    val INVOKE_OPERATOR_NAME = Name.identifier("invoke")
-    val COPY_METHOD_NAME = Name.identifier("copy")
-}

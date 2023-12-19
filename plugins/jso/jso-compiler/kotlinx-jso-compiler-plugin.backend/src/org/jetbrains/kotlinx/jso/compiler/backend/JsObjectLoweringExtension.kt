@@ -8,13 +8,14 @@ import org.jetbrains.kotlin.backend.common.DeclarationTransformer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower
+import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.util.*
+import org.jetbrains.kotlin.util.OperatorNameConventions
 import org.jetbrains.kotlinx.jso.compiler.resolve.JsSimpleObjectPluginKey
-import org.jetbrains.kotlinx.jso.compiler.resolve.SpecialNames
 import org.jetbrains.kotlinx.jso.compiler.resolve.StandardIds
 
 private class MoveExternalInlineFunctionsWithBodiesOutside(private val context: IrPluginContext) : DeclarationTransformer {
@@ -31,7 +32,7 @@ private class MoveExternalInlineFunctionsWithBodiesOutside(private val context: 
         file.declarations.add(declaration)
 
         declaration.body = when (declaration.name) {
-            SpecialNames.COPY_METHOD_NAME, SpecialNames.INVOKE_OPERATOR_NAME -> declaration.generateBodyForFactoryAndCopyFunction()
+            StandardNames.DATA_CLASS_COPY, OperatorNameConventions.INVOKE -> declaration.generateBodyForFactoryAndCopyFunction()
             else -> error("Unexpected function with name `${declaration.name.identifier}`")
         }
 
