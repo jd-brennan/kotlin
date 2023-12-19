@@ -3,5 +3,5 @@
 fun foo(y: String) {
     var x: String? = null
     y.let { x = it }
-    x<!UNSAFE_CALL!>.<!>length // Smart cast is not possible
+    x.length // Smart cast is not possible
 }

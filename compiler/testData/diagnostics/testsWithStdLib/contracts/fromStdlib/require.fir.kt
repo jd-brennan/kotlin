@@ -3,7 +3,7 @@
 
 fun testRequireSmartcast(x: Any?) {
     require(x is String)
-    <!DEBUG_INFO_SMARTCAST!>x<!>.length
+    x.length
 }
 
 fun testRequireUnreachableCode() {
@@ -13,15 +13,15 @@ fun testRequireUnreachableCode() {
 
 fun testRequireWithMessage(x: Any?) {
     require(x is String) { "x is not String!" }
-    <!DEBUG_INFO_SMARTCAST!>x<!>.length
+    x.length
 }
 
 fun testRequireWithFailingMessage(x: Any?) {
     require(x is String) { throw kotlin.IllegalStateException("What a strange idea") }
-    <!DEBUG_INFO_SMARTCAST!>x<!>.length
+    x.length
 }
 
 fun tesRequireNotNullWithMessage(x: Int?) {
     requireNotNull(x) { "x is null!"}
-    <!DEBUG_INFO_SMARTCAST!>x<!>.inc()
+    x.inc()
 }

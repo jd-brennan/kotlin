@@ -34,15 +34,15 @@ fun Any?.test_2() {
 }
 
 fun test_3(a: Any, b: Any, c: Any) {
-    <!NEW_INFERENCE_NO_INFORMATION_FOR_PARAMETER, NEW_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>with<!>(a) wa@{
+    with(a) wa@{
         with(b) wb@{
             with(c) wc@{
                 this@wb as A
                 this@wb.foo()
                 foo()
             }
-            this.<!UNRESOLVED_REFERENCE!>foo<!>()
-            <!UNRESOLVED_REFERENCE!>foo<!>()
+            this.foo()
+            foo()
         }
     }
 }
