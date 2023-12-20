@@ -189,6 +189,7 @@ private fun JavaClassifierType.toConeKotlinTypeForFlexibleBound(
             }
 
             val lookupTag = classId.toLookupTag()
+            val allTypeParametersNumber = if (isRaw || lookupTag != lowerBound?.lookupTag) classifier.allTypeParametersNumber() else 0
             // When converting type parameter bounds we should not attempt to load any classes, as this may trigger
             // enhancement of type parameter bounds on some other class that depends on this one. Also, in case of raw
             // types specifically there could be an infinite recursion on the type parameter itself.
@@ -199,20 +200,20 @@ private fun JavaClassifierType.toConeKotlinTypeForFlexibleBound(
                             ?.toFirRegularClassSymbol(session)?.typeParameterSymbols
                     // Given `C<T : X>`, `C` -> `C<X>..C<*>?`.
                     when {
-                        mode.insideAnnotation -> Array(classifier.allTypeParametersNumber()) { ConeStarProjection }
+                        mode.insideAnnotation -> Array(allTypeParametersNumber) { ConeStarProjection }
                         else -> typeParameterSymbols?.getProjectionsForRawType(session)
-                            ?: Array(classifier.allTypeParametersNumber()) { ConeStarProjection }
+                            ?: Array(allTypeParametersNumber) { ConeStarProjection }
                     }
                 }
 
-                lookupTag != lowerBound?.lookupTag && typeArguments.isNotEmpty() -> {
+                lookupTag != lowerBound?.lookupTag && allTypeParametersNumber > 0 -> {
                     val typeParameterSymbols =
                         lookupTag.takeIf { mode != FirJavaTypeConversionMode.TYPE_PARAMETER_BOUND_FIRST_ROUND }
                             ?.toFirRegularClassSymbol(session)?.typeParameterSymbols
-                    Array(typeArguments.size) { index ->
+                    Array(allTypeParametersNumber) { index ->
                         // TODO: check this
                         val newMode = if (mode.insideAnnotation) FirJavaTypeConversionMode.DEFAULT else mode
-                        val argument = typeArguments[index]
+                        val argument = typeArguments.getOrNull(index)
                         val variance = typeParameterSymbols?.getOrNull(index)?.fir?.variance ?: Variance.INVARIANT
                         argument.toConeTypeProjection(session, javaTypeParameterStack, variance, newMode)
                     }
