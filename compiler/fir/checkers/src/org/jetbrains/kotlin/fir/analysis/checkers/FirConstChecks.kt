@@ -228,7 +228,7 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
                     }
                     propertySymbol.isLocal -> return ConstantArgumentKind.NOT_CONST
                     propertyAccessExpression.getExpandedType().classId == StandardClassIds.KClass -> return ConstantArgumentKind.NOT_KCLASS_LITERAL
-                    propertySymbol.isConst -> ConstantArgumentKind.VALID_CONST
+                    propertySymbol.isConst -> return ConstantArgumentKind.VALID_CONST
                 }
 
                 return when (property.initializer) {
