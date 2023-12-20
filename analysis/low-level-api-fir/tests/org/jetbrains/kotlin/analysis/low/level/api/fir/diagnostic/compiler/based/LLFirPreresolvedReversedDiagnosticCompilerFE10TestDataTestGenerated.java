@@ -17780,6 +17780,12 @@ public class LLFirPreresolvedReversedDiagnosticCompilerFE10TestDataTestGenerated
                 }
 
                 @Test
+                @TestMetadata("selfTypeTypeHole.kt")
+                public void testSelfTypeTypeHole() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/inference/capturedTypes/selfTypeTypeHole.kt");
+                }
+
+                @Test
                 @TestMetadata("starProjectionRegression.kt")
                 public void testStarProjectionRegression() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/inference/capturedTypes/starProjectionRegression.kt");
