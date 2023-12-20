@@ -210,9 +210,9 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
         propertyAccessExpression: FirPropertyAccessExpression, data: Nothing?
     ): ConstantArgumentKind {
         val propertySymbol = propertyAccessExpression.toReference()?.toResolvedCallableSymbol(discardErrorReference = true)
-            ?: return ConstantArgumentKind.NOT_CONST
 
         when (propertySymbol) {
+            null -> return ConstantArgumentKind.VALID_CONST
             is FirPropertySymbol -> {
                 val classKindOfParent = (propertySymbol.getReferencedClassSymbol() as? FirRegularClassSymbol)?.classKind
                 if (classKindOfParent == ClassKind.ENUM_CLASS) {
