@@ -239,7 +239,7 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
                 return ConstantArgumentKind.NOT_CONST
             }
 
-            checkConstantArguments(exp, session).ifNotValidConst { return it }
+            exp.accept(this, data).ifNotValidConst { return it }
         }
 
         return ConstantArgumentKind.VALID_CONST
@@ -251,7 +251,7 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
     ): ConstantArgumentKind {
         val expressionType = qualifiedAccessExpression.getExpandedType()
         if (expressionType.isReflectFunctionType(session) || expressionType.isKProperty(session) || expressionType.isKMutableProperty(session)) {
-            return checkConstantArguments(qualifiedAccessExpression.dispatchReceiver, session)
+            return qualifiedAccessExpression.dispatchReceiver?.accept(this, data) ?: ConstantArgumentKind.VALID_CONST
         }
 
         val expressionSymbol = qualifiedAccessExpression.toReference()?.toResolvedCallableSymbol(discardErrorReference = true)
@@ -263,7 +263,7 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
             property.unwrapFakeOverrides().symbol.canBeEvaluated() || property.isCompileTimeBuiltinProperty() -> {
                 val receiver = listOf(qualifiedAccessExpression.dispatchReceiver, qualifiedAccessExpression.extensionReceiver)
                     .single { it != null }
-                return checkConstantArguments(receiver, session)
+                return receiver?.accept(this, data) ?: ConstantArgumentKind.VALID_CONST
             }
             propertySymbol.isLocal -> return ConstantArgumentKind.NOT_CONST
             expressionType.classId == StandardClassIds.KClass -> return ConstantArgumentKind.NOT_KCLASS_LITERAL
