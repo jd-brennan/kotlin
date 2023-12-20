@@ -9,84 +9,62 @@ import org.gradle.api.logging.Logger
 import kotlin.concurrent.thread
 
 /**
- * Run a command with the given parameters and optional fallback configuration
+ * Executes a command and returns the input text.
  *
- * @param command The command to be executed, specified as a list of strings.
- * @param logger An optional logger to log information about the command execution.
- * @param errorHandler An optional function that handles errors returned by the command.
- * @param processConfiguration An optional function that configures the process before it is executed.
- * @return The output text of the command or the fallback text if there is an error.
+ * @param command the command and its arguments to be executed as a list of strings.
+ * @param logger an optional logger to log information about the command execution.
+ * @param errorHandler (Optional) A function that handles any errors that occur during the command execution.
+ * @param processConfiguration a function to configure the process before execution.
+ * @return The input text of the executed command.
  */
 internal fun runCommand(
     command: List<String>,
     logger: Logger? = null,
     errorHandler: ((retCode: Int, output: String, process: Process) -> String?)? = null,
     processConfiguration: ProcessBuilder.() -> Unit = { },
-): String = runCommandWithFallback(
-    command,
-    logger,
-    { retCode, output, process ->
-        handleError {
-            errorHandler?.invoke(retCode, output, process)
-        }
-    },
-    processConfiguration
-)
-
-internal class ProcessFallbackBuilder {
-    private var action: (() -> String)? = null
-    private var error: (() -> String?)? = null
-
-    fun performFallback(action: () -> String) {
-        this.action = action
+): String {
+    val runResult = assembleAndRunProcess(command, logger, processConfiguration)
+    check(runResult.retCode == 0) {
+        errorHandler?.invoke(runResult.retCode, runResult.output, runResult.process) ?: createErrorMessage(command, runResult)
     }
 
-    fun handleError(error: () -> String?) {
-        this.error = error
-    }
-
-    val fallbackText: String? get() = action?.let { it().takeIf { it.isNotBlank() } }
-    val errorText: String? get() = error?.let { it()?.takeIf { it.isNotBlank() } }
+    return runResult.inputText
 }
 
+/**
+ * Sealed class representing the fallback behavior for a command.
+ */
+sealed class CommandFallback {
+    data class Action(val fallback: String) : CommandFallback()
+    data class Error(val error: String?) : CommandFallback()
+}
 
 /**
- * Executes a command with the given parameters and returns the output text or fallback text in case of an error.
+ * Executes the specified command with fallback behavior in case of non-zero return code.
  *
- * @param command The command to be executed, specified as a list of strings.
- * @param logger An optional logger to log information about the command execution.
- * @param fallbackConfiguration An optional function that configures the fallback behavior in case of an error.
- * @param processConfiguration An optional function that configures the process before it is executed.
- * @return The output text of the command or the fallback text if there is an error.
+ * @param command the command and its arguments to be executed as a list of strings.
+ * @param logger an optional logger to log information about the command execution.
+ * @param fallback a function that provides the fallback behavior. It takes the return code, output, and process as parameters and returns a [CommandFallback] object.
+ * @param processConfiguration a function to configure the process before execution.
+ * @return the output of the command if the return code is 0, otherwise the fallback action or error.
  */
 internal fun runCommandWithFallback(
     command: List<String>,
     logger: Logger? = null,
-    fallbackConfiguration: ProcessFallbackBuilder.(retCode: Int, output: String, process: Process) -> Unit,
+    fallback: (retCode: Int, output: String, process: Process) -> CommandFallback,
     processConfiguration: ProcessBuilder.() -> Unit = { },
 ): String {
     val runResult = assembleAndRunProcess(command, logger, processConfiguration)
     return if (runResult.retCode != 0) {
-        val fallback = ProcessFallbackBuilder().apply {
-            this.fallbackConfiguration(runResult.retCode, runResult.output, runResult.process)
-        }
-
-        checkNotNull(fallback.fallbackText) {
-            fallback.errorText ?: createErrorMessage(command, runResult)
+        when (val fallbackOption = fallback(runResult.retCode, runResult.output, runResult.process)) {
+            is CommandFallback.Action -> fallbackOption.fallback
+            is CommandFallback.Error -> error(fallbackOption.error ?: createErrorMessage(command, runResult))
         }
     } else {
         runResult.inputText
     }
 }
 
-/**
- * Represents the result of running a process.
- *
- * @property inputText The text written to the input stream of the process.
- * @property errorText The text written to the error stream of the process.
- * @property retCode The return code of the process.
- * @property process The process object.
- */
 private data class RunProcessResult(
     val inputText: String,
     val errorText: String,
@@ -96,14 +74,6 @@ private data class RunProcessResult(
     val output: String get() = inputText.ifBlank { errorText }
 }
 
-/**
- * Assembles and runs a process with the given command, logger, and process configuration.
- *
- * @param command The command to be executed, specified as a list of strings.
- * @param logger An optional logger to log information about the command execution.
- * @param processConfiguration An optional function that configures the process before it is executed.
- * @return A [RunProcessResult] object containing the input text, error text, return code, and process.
- */
 private fun assembleAndRunProcess(
     command: List<String>,
     logger: Logger? = null,

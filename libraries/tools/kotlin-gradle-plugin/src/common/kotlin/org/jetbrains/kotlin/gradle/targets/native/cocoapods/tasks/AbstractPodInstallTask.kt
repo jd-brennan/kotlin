@@ -11,11 +11,10 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.work.DisableCachingByDefault
+import org.jetbrains.kotlin.gradle.utils.CommandFallback
 import org.jetbrains.kotlin.gradle.utils.onlyIfCompat
-import org.jetbrains.kotlin.gradle.utils.runCommand
 import org.jetbrains.kotlin.gradle.utils.runCommandWithFallback
 import java.io.File
-import java.io.IOException
 
 /**
  * The task takes the path to the Podfile and calls `pod install`
@@ -63,15 +62,11 @@ abstract class AbstractPodInstallTask : CocoapodsTask() {
 
         return runCommandWithFallback(podInstallCommand,
                                       logger,
-                                      fallbackConfiguration = { retCode, output, process ->
+                                      fallback = { retCode, output, process ->
                                           if (output.contains("out-of-date source repos which you can update with `pod repo update` or with `pod install --repo-update`") && updateRepo.not()) {
-                                              performFallback {
-                                                  runPodInstall(true)
-                                              }
+                                              CommandFallback.Action(runPodInstall(true))
                                           } else {
-                                              handleError {
-                                                  sharedHandleError(podInstallCommand, retCode, output, process)
-                                              }
+                                              CommandFallback.Error(sharedHandleError(podInstallCommand, retCode, output, process))
                                           }
                                       },
                                       processConfiguration = {
