@@ -112,17 +112,17 @@ internal fun checkConstantArguments(
             checkConstantArguments(expression.rightOperand, session)?.let { return it }
         }
         expression is FirGetClassCall -> {
-            var coneType = (expression as? FirCall)?.argument?.getExpandedType()
+            var coneType = expression.argument.getExpandedType()
 
             if (coneType is ConeErrorType)
                 return ConstantArgumentKind.NOT_CONST
 
-            while (coneType?.classId == StandardClassIds.Array)
+            while (coneType.classId == StandardClassIds.Array)
                 coneType = (coneType.lowerBoundIfFlexible().typeArguments.first() as? ConeKotlinTypeProjection)?.type ?: break
 
             return when {
                 coneType is ConeTypeParameterType -> ConstantArgumentKind.KCLASS_LITERAL_OF_TYPE_PARAMETER_ERROR
-                (expression as FirCall).argument !is FirResolvedQualifier -> ConstantArgumentKind.NOT_KCLASS_LITERAL
+                expression.argument !is FirResolvedQualifier -> ConstantArgumentKind.NOT_KCLASS_LITERAL
                 else -> null
             }
         }
