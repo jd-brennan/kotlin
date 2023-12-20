@@ -210,7 +210,6 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
         propertyAccessExpression: FirPropertyAccessExpression, data: Nothing?
     ): ConstantArgumentKind {
         val propertySymbol = propertyAccessExpression.toReference()?.toResolvedCallableSymbol(discardErrorReference = true)
-
         when (propertySymbol) {
             null -> return ConstantArgumentKind.VALID_CONST
             is FirPropertySymbol -> {
@@ -219,8 +218,26 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
                     return ConstantArgumentKind.ENUM_NOT_CONST
                 }
 
-                if (propertySymbol.isConst) {
-                    return ConstantArgumentKind.VALID_CONST
+                @OptIn(SymbolInternals::class)
+                val property = propertySymbol.fir
+                when {
+                    property.unwrapFakeOverrides().symbol.canBeEvaluated() || property.isCompileTimeBuiltinProperty() -> {
+                        val receiver = listOf(propertyAccessExpression.dispatchReceiver, propertyAccessExpression.extensionReceiver)
+                            .single { it != null }
+                        return receiver?.accept(this, data) ?: ConstantArgumentKind.VALID_CONST
+                    }
+                    propertySymbol.isLocal -> return ConstantArgumentKind.NOT_CONST
+                    propertyAccessExpression.getExpandedType().classId == StandardClassIds.KClass -> return ConstantArgumentKind.NOT_KCLASS_LITERAL
+                    propertySymbol.isConst -> ConstantArgumentKind.VALID_CONST
+                }
+
+                return when (property.initializer) {
+                    is FirConstExpression<*> -> when {
+                        property.isVal -> ConstantArgumentKind.NOT_CONST_VAL_IN_CONST_EXPRESSION
+                        else -> ConstantArgumentKind.NOT_CONST
+                    }
+                    is FirGetClassCall -> ConstantArgumentKind.NOT_KCLASS_LITERAL
+                    else -> ConstantArgumentKind.NOT_CONST
                 }
             }
             is FirFieldSymbol -> {
@@ -272,28 +289,7 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
             return qualifiedAccessExpression.dispatchReceiver?.accept(this, data) ?: ConstantArgumentKind.VALID_CONST
         }
 
-        val expressionSymbol = qualifiedAccessExpression.toReference()?.toResolvedCallableSymbol(discardErrorReference = true)
-        val propertySymbol = expressionSymbol as? FirPropertySymbol ?: return ConstantArgumentKind.NOT_CONST
-
-        @OptIn(SymbolInternals::class)
-        val property = propertySymbol.fir
-        when {
-            property.unwrapFakeOverrides().symbol.canBeEvaluated() || property.isCompileTimeBuiltinProperty() -> {
-                val receiver = listOf(qualifiedAccessExpression.dispatchReceiver, qualifiedAccessExpression.extensionReceiver)
-                    .single { it != null }
-                return receiver?.accept(this, data) ?: ConstantArgumentKind.VALID_CONST
-            }
-            propertySymbol.isLocal -> return ConstantArgumentKind.NOT_CONST
-            expressionType.classId == StandardClassIds.KClass -> return ConstantArgumentKind.NOT_KCLASS_LITERAL
-        }
-        return when (property.initializer) {
-            is FirConstExpression<*> -> when {
-                property.isVal -> ConstantArgumentKind.NOT_CONST_VAL_IN_CONST_EXPRESSION
-                else -> ConstantArgumentKind.NOT_CONST
-            }
-            is FirGetClassCall -> ConstantArgumentKind.NOT_KCLASS_LITERAL
-            else -> ConstantArgumentKind.NOT_CONST
-        }
+        return ConstantArgumentKind.VALID_CONST
     }
 
     // --- Utils ---
