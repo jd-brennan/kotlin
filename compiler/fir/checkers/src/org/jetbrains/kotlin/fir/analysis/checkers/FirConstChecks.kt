@@ -111,6 +111,10 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
         return ConstantArgumentKind.NOT_CONST
     }
 
+    override fun visitErrorExpression(errorExpression: FirErrorExpression, data: Nothing?): ConstantArgumentKind {
+        return ConstantArgumentKind.VALID_CONST
+    }
+
     override fun visitNamedArgumentExpression(namedArgumentExpression: FirNamedArgumentExpression, data: Nothing?): ConstantArgumentKind {
         return namedArgumentExpression.expression.accept(this, data)
     }
