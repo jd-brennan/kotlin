@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.cli.jvm.compiler
 
-import com.intellij.openapi.extensions.ExtensionPoint
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFile
@@ -67,14 +66,13 @@ open class VfsBasedProjectEnvironment(
     @OptIn(SessionConfiguration::class)
     override fun registerAsJavaElementFinder(firSession: FirSession) {
         val psiFinderExtensionPoint = PsiElementFinder.EP.getPoint(project)
-        psiFinderExtensionPoint.unregisterFinders<JavaElementFinder>()
-        psiFinderExtensionPoint.unregisterFinders<FirJavaElementFinder>()
+        if (psiFinderExtensionPoint.extensionList.any { it is JavaElementFinder }) {
+            psiFinderExtensionPoint.unregisterExtension(JavaElementFinder::class.java)
+        }
 
         val firJavaElementFinder = FirJavaElementFinder(firSession, project)
         firSession.register(FirJavaElementFinder::class, firJavaElementFinder)
-        // see comment and TODO in KotlinCoreEnvironment.registerKotlinLightClassSupport (KT-64296)
-        @Suppress("DEPRECATION")
-        PsiElementFinder.EP.getPoint(project).registerExtension(firJavaElementFinder)
+        psiFinderExtensionPoint.registerExtension(firJavaElementFinder, project)
     }
 
     private fun List<VirtualFile>.toSearchScope(allowOutOfProjectRoots: Boolean) =
@@ -154,9 +152,3 @@ fun KotlinCoreEnvironment.toAbstractProjectEnvironment(): AbstractProjectEnviron
 
 fun GlobalSearchScope.toAbstractProjectFileSearchScope(): AbstractProjectFileSearchScope =
     PsiBasedProjectFileSearchScope(this)
-
-inline fun <reified T : PsiElementFinder> ExtensionPoint<PsiElementFinder>.unregisterFinders() {
-    if (extensionList.any { it is T }) {
-        unregisterExtension(T::class.java)
-    }
-}

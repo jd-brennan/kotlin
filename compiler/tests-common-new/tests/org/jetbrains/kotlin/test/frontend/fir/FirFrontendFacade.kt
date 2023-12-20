@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.asJava.finder.JavaElementFinder
 import org.jetbrains.kotlin.cli.jvm.compiler.PsiBasedProjectFileSearchScope
 import org.jetbrains.kotlin.cli.jvm.compiler.TopDownAnalyzerFacadeForJVM
 import org.jetbrains.kotlin.cli.jvm.compiler.VfsBasedProjectEnvironment
-import org.jetbrains.kotlin.cli.jvm.compiler.unregisterFinders
 import org.jetbrains.kotlin.cli.jvm.config.jvmClasspathRoots
 import org.jetbrains.kotlin.cli.jvm.config.jvmModularRoots
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -279,7 +278,7 @@ open class FirFrontendFacade(
 
         val project = compilerConfigurationProvider.getProject(module)
 
-        PsiElementFinder.EP.getPoint(project).unregisterFinders<JavaElementFinder>()
+        PsiElementFinder.EP.getPoint(project).unregisterExtension(JavaElementFinder::class.java)
 
         val parser = module.directives.singleValue(FirDiagnosticsDirectives.FIR_PARSER)
 
