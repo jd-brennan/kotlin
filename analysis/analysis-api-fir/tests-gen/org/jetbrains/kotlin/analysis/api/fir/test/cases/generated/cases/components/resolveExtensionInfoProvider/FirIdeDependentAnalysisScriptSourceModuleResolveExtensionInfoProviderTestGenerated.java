@@ -36,7 +36,8 @@ public class FirIdeDependentAnalysisScriptSourceModuleResolveExtensionInfoProvid
                 FrontendKind.Fir,
                 TestModuleKind.ScriptSource,
                 AnalysisSessionMode.Dependent,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

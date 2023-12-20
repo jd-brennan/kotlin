@@ -36,7 +36,8 @@ public class FirIdeDependentAnalysisSourceModuleTypeScopeTestGenerated extends A
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Dependent,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

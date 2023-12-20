@@ -36,7 +36,8 @@ public class FirIdeNormalAnalysisSourceModuleResolveCandidatesTestGenerated exte
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

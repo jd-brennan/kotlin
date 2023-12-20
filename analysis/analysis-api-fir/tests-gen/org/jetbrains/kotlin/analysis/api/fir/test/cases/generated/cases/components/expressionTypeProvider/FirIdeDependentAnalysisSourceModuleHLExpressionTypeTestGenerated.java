@@ -36,7 +36,8 @@ public class FirIdeDependentAnalysisSourceModuleHLExpressionTypeTestGenerated ex
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Dependent,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

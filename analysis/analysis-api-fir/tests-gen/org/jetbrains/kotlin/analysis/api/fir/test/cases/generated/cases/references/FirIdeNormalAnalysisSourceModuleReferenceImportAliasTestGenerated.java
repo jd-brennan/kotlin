@@ -36,7 +36,8 @@ public class FirIdeNormalAnalysisSourceModuleReferenceImportAliasTestGenerated e
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

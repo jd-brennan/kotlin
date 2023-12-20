@@ -36,7 +36,8 @@ public class FirIdeDependentAnalysisSourceModuleHLSmartCastInfoTestGenerated ext
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Dependent,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

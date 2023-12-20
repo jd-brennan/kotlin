@@ -36,7 +36,8 @@ public class FirIdeDependentAnalysisScriptSourceModuleSymbolRenderingByReference
                 FrontendKind.Fir,
                 TestModuleKind.ScriptSource,
                 AnalysisSessionMode.Dependent,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

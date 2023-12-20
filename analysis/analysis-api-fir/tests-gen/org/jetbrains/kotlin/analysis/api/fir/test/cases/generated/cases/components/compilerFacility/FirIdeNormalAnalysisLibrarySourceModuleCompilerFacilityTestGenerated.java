@@ -36,7 +36,8 @@ public class FirIdeNormalAnalysisLibrarySourceModuleCompilerFacilityTestGenerate
                 FrontendKind.Fir,
                 TestModuleKind.LibrarySource,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

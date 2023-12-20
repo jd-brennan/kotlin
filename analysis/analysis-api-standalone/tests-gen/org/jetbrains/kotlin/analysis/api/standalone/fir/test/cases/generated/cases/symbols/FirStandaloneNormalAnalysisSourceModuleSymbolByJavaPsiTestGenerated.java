@@ -36,7 +36,8 @@ public class FirStandaloneNormalAnalysisSourceModuleSymbolByJavaPsiTestGenerated
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Standalone
+                AnalysisApiMode.Standalone,
+                false
             )
         );
     }

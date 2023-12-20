@@ -13,7 +13,11 @@ object AnalysisApiFirStandaloneModeTestConfiguratorFactory : AnalysisApiTestConf
 
         return when (data.moduleKind) {
             TestModuleKind.Source -> when (data.analysisSessionMode) {
-                AnalysisSessionMode.Normal -> StandaloneModeConfigurator
+                AnalysisSessionMode.Normal -> if (data.supportsLibraryCompilation) {
+                    StandaloneModeConfiguratorWithLibraryCompilation
+                } else {
+                    StandaloneModeConfigurator
+                }
                 AnalysisSessionMode.Dependent -> unsupportedModeError(data)
             }
 

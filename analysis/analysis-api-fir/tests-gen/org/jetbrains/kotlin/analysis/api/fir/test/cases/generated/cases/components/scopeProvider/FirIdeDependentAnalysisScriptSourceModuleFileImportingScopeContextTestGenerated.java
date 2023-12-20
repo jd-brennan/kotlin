@@ -36,7 +36,8 @@ public class FirIdeDependentAnalysisScriptSourceModuleFileImportingScopeContextT
                 FrontendKind.Fir,
                 TestModuleKind.ScriptSource,
                 AnalysisSessionMode.Dependent,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

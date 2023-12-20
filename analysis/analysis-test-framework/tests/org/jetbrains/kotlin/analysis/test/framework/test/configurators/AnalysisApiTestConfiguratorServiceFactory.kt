@@ -26,6 +26,14 @@ data class AnalysisApiTestConfiguratorFactoryData(
     val moduleKind: TestModuleKind,
     val analysisSessionMode: AnalysisSessionMode,
     val analysisApiMode: AnalysisApiMode,
+
+    /**
+     * Whether the test should support compiling test modules into binary libraries, regardless of the [moduleKind].
+     *
+     * If desired, [supportsLibraryCompilation] must be specified during test generation. It will not be configured as an enumerated option
+     * like the other factory parameters in this class (see `AnalysisApiConfiguratorFactoryProvider.allPossibleFactoryDataList`).
+     */
+    val supportsLibraryCompilation: Boolean = false,
 )
 
 fun AnalysisApiTestConfiguratorFactoryData.defaultExtension(): String = when (this.moduleKind) {

@@ -36,7 +36,8 @@ public class FirIdeDependentAnalysisScriptSourceModuleAnalysisApiGetSuperTypesTe
                 FrontendKind.Fir,
                 TestModuleKind.ScriptSource,
                 AnalysisSessionMode.Dependent,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

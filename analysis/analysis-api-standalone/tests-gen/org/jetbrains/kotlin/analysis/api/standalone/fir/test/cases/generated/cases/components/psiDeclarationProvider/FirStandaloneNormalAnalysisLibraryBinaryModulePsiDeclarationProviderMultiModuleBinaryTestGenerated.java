@@ -36,7 +36,8 @@ public class FirStandaloneNormalAnalysisLibraryBinaryModulePsiDeclarationProvide
                 FrontendKind.Fir,
                 TestModuleKind.LibraryBinary,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Standalone
+                AnalysisApiMode.Standalone,
+                false
             )
         );
     }

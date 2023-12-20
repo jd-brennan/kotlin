@@ -36,7 +36,8 @@ public class FirIdeNormalAnalysisSourceModuleMemberScopeTestGenerated extends Ab
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

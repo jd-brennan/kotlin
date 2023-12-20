@@ -34,6 +34,7 @@ class AnalysisApiTestGroup(
     fun test(
         testClass: KClass<*>,
         filter: TestFilter = { true },
+        supportsLibraryCompilation: Boolean = false,
         init: TestGroup.TestClass.(data: AnalysisApiTestConfiguratorFactoryData) -> Unit,
     ) {
         with(generator.suite) {
@@ -45,7 +46,10 @@ class AnalysisApiTestGroup(
                     if (testRoot == null) return@forEach
                     testGroup(testRoot, fullTestPath) {
                         datas.forEach { data ->
-                            analysisApiTestClass(data, testClass, init)
+                            val dataWithExplicitParameters = if (supportsLibraryCompilation != data.supportsLibraryCompilation) {
+                                data.copy(supportsLibraryCompilation = supportsLibraryCompilation)
+                            } else data
+                            analysisApiTestClass(dataWithExplicitParameters, testClass, init)
                         }
                     }
                 }

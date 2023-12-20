@@ -28,6 +28,7 @@ object AnalysisApiFe10TestConfiguratorFactory : AnalysisApiTestConfiguratorFacto
             data.frontend != FrontendKind.Fe10 -> false
             data.analysisSessionMode != AnalysisSessionMode.Normal -> false
             data.analysisApiMode != AnalysisApiMode.Ide -> false
+            data.supportsLibraryCompilation -> false
             else -> when (data.moduleKind) {
                 TestModuleKind.Source -> true
                 TestModuleKind.ScriptSource,

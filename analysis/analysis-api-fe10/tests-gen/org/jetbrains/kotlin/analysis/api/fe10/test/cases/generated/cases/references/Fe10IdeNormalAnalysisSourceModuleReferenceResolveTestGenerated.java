@@ -36,7 +36,8 @@ public class Fe10IdeNormalAnalysisSourceModuleReferenceResolveTestGenerated exte
                 FrontendKind.Fe10,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

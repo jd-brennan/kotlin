@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.analysis.low.level.api.fir.test.configurators.Analys
 import org.jetbrains.kotlin.analysis.low.level.api.fir.test.configurators.AnalysisApiFirLibrarySourceTestConfigurator
 import org.jetbrains.kotlin.analysis.low.level.api.fir.test.configurators.AnalysisApiFirScriptTestConfigurator
 import org.jetbrains.kotlin.analysis.low.level.api.fir.test.configurators.AnalysisApiFirSourceTestConfigurator
+import org.jetbrains.kotlin.analysis.low.level.api.fir.test.configurators.AnalysisApiFirSourceTestConfiguratorWithLibraryCompilation
 import org.jetbrains.kotlin.analysis.test.framework.test.configurators.*
 
 object AnalysisApiFirTestConfiguratorFactory : AnalysisApiTestConfiguratorFactory() {
@@ -22,7 +23,11 @@ object AnalysisApiFirTestConfiguratorFactory : AnalysisApiTestConfiguratorFactor
             }
 
             TestModuleKind.Source -> when (data.analysisSessionMode) {
-                AnalysisSessionMode.Normal -> AnalysisApiFirSourceTestConfigurator(analyseInDependentSession = false)
+                AnalysisSessionMode.Normal -> if (data.supportsLibraryCompilation) {
+                    AnalysisApiFirSourceTestConfiguratorWithLibraryCompilation(analyseInDependentSession = false)
+                } else {
+                    AnalysisApiFirSourceTestConfigurator(analyseInDependentSession = false)
+                }
                 AnalysisSessionMode.Dependent -> AnalysisApiFirSourceTestConfigurator(analyseInDependentSession = true)
             }
 

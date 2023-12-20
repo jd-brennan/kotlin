@@ -36,7 +36,8 @@ public class FirIdeNormalAnalysisScriptSourceModuleAnalysisApiImportOptimizerTes
                 FrontendKind.Fir,
                 TestModuleKind.ScriptSource,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }

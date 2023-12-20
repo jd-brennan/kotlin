@@ -36,7 +36,8 @@ public class FirStandaloneNormalAnalysisSourceModuleAnalysisApiSpecificAnnotatio
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Normal,
-                AnalysisApiMode.Standalone
+                AnalysisApiMode.Standalone,
+                false
             )
         );
     }

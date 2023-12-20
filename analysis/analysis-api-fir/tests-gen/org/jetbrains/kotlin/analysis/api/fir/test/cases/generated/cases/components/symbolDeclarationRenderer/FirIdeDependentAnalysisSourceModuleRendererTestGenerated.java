@@ -36,7 +36,8 @@ public class FirIdeDependentAnalysisSourceModuleRendererTestGenerated extends Ab
                 FrontendKind.Fir,
                 TestModuleKind.Source,
                 AnalysisSessionMode.Dependent,
-                AnalysisApiMode.Ide
+                AnalysisApiMode.Ide,
+                false
             )
         );
     }
