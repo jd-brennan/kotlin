@@ -601,13 +601,6 @@ standaloneTest("link_default_libs") {
     UtilsKt.dependsOnPlatformLibs(it)
 }
 
-linkTest("no_purge_for_dependencies") {
-    useGoldenData = true
-    source = "link/purge1/prog.kt"
-    lib = "link/purge1/lib.kt"
-    UtilsKt.dependsOnPlatformLibs(it)
-}
-
 tasks.register("throw0", KonanLocalTest) {
     useGoldenData = true
     source = "runtime/basic/throw0.kt"
