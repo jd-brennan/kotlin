@@ -38,6 +38,12 @@ public class ClassicJvmIrSourceRangesTestGenerated extends AbstractClassicJvmIrS
     }
 
     @Test
+    @TestMetadata("collectionStream.kt")
+    public void testCollectionStream() throws Exception {
+        runTest("compiler/testData/ir/sourceRanges/collectionStream.kt");
+    }
+
+    @Test
     @TestMetadata("comments.kt")
     public void testComments() throws Exception {
         runTest("compiler/testData/ir/sourceRanges/comments.kt");

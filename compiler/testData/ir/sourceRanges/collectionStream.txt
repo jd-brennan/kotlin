@@ -1,0 +1,7 @@
+@0:0..7:0 FILE fqName:<root> fileName:/collectionStream.kt
+  @4:0..6:1 FUN name:f visibility:public modality:FINAL <> (collection:kotlin.collections.Collection<kotlin.String>) returnType:kotlin.Unit
+    @4:6..36 VALUE_PARAMETER name:collection index:0 type:kotlin.collections.Collection<kotlin.String>
+    @4:38..6:1 BLOCK_BODY
+      @5:15..23 TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
+        @5:15..23 CALL 'public open fun stream (): @[EnhancedNullability] java.util.stream.Stream<@[EnhancedNullability] E of kotlin.collections.Collection> declared in kotlin.collections.Collection' type=@[EnhancedNullability] java.util.stream.Stream<@[EnhancedNullability] kotlin.String> origin=null
+          @5:4..14 GET_VAR 'collection: kotlin.collections.Collection<kotlin.String> declared in <root>.f' type=kotlin.collections.Collection<kotlin.String> origin=null
