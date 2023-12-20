@@ -366,7 +366,7 @@ class GeneralNativeIT : KGPBaseTest() {
     @GradleTest
     fun testGenerateLLDBInitFile(gradleVersion: GradleVersion) {
         nativeProject("native-binaries/frameworks", gradleVersion = gradleVersion) {
-            val lldbPath = projectPath.resolve("lldbinit")
+            val lldbPath = projectPath.resolve("build").resolve("lldbinit")
 
             build(":setupLLDBScript") {
                 assertFileInProjectExists(lldbPath.absolutePathString())
