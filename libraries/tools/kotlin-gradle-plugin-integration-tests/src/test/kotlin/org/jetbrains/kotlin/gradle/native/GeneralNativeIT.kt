@@ -368,7 +368,7 @@ class GeneralNativeIT : KGPBaseTest() {
         nativeProject("native-binaries/frameworks", gradleVersion = gradleVersion) {
             val lldbPath = projectPath.resolve("build").resolve("lldbinit")
 
-            build(":setupLLDBScript") {
+            build(":setupLldbScript") {
                 assertFileInProjectExists(lldbPath.absolutePathString())
                 assertFileContains(lldbPath, "command script import")
                 assertFileContains(lldbPath, "konan_lldb.py")
