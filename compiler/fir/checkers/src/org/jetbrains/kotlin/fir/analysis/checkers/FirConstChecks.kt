@@ -294,6 +294,10 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
         return ConstantArgumentKind.VALID_CONST
     }
 
+    override fun visitCallableReferenceAccess(callableReferenceAccess: FirCallableReferenceAccess, data: Nothing?): ConstantArgumentKind {
+        return visitQualifiedAccessExpression(callableReferenceAccess, data)
+    }
+
     // --- Utils ---
     private fun FirBasedSymbol<*>.canBeEvaluated(): Boolean {
         return intrinsicConstEvaluation && this.hasAnnotation(StandardClassIds.Annotations.IntrinsicConstEvaluation, session)
