@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.contain
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.containingDeclarationProvider.AbstractContainingDeclarationProviderByPsiTest
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.diagnosticProvider.AbstractCodeFragmentCollectDiagnosticsTest
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.diagnosticProvider.AbstractCollectDiagnosticsTest
+import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.diagnosticProvider.AbstractMixedMultiModuleCollectDiagnosticsTest
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.expressionInfoProvider.AbstractIsUsedAsExpressionTest
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.expressionInfoProvider.AbstractReturnTargetSymbolTest
 import org.jetbrains.kotlin.analysis.api.impl.base.test.cases.components.expressionInfoProvider.AbstractWhenMissingCasesTest
@@ -322,6 +323,15 @@ private fun AnalysisApiTestGroup.generateAnalysisApiComponentsTests() {
     component("diagnosticsProvider", filter = analysisSessionModeIs(AnalysisSessionMode.Normal)) {
         test(AbstractCollectDiagnosticsTest::class) {
             model(it, "diagnostics")
+        }
+
+        // Restricted to FIR since FE10 doesn't support library compilation. Standalone tests are currently excluded because of KT-64495.
+        test(
+            AbstractMixedMultiModuleCollectDiagnosticsTest::class,
+            filter = testModuleKindIs(TestModuleKind.Source) and frontendIs(FrontendKind.Fir) and analysisApiModeIs(AnalysisApiMode.Ide),
+            supportsLibraryCompilation = true,
+        ) {
+            model(it, "mixedMultiModule")
         }
 
         test(

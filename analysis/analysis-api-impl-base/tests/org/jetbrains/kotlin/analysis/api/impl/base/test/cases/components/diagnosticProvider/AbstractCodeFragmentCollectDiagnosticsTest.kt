@@ -14,10 +14,10 @@ import org.jetbrains.kotlin.test.services.TestServices
 import java.io.File
 
 abstract class AbstractCodeFragmentCollectDiagnosticsTest : AbstractCollectDiagnosticsTest() {
-    override fun doTestByFileStructure(ktFile: KtFile, module: TestModule, testServices: TestServices) {
+    override fun doTestByFileStructure(ktFile: KtFile, mainModule: TestModule, testServices: TestServices) {
         val contextElement = testServices.expressionMarkerProvider.getElementOfTypeAtCaret<KtElement>(ktFile)
 
-        val fragmentText = module.files.single().originalFile
+        val fragmentText = mainModule.files.single().originalFile
             .run { File(parent, "$nameWithoutExtension.fragment.$extension") }
             .readText()
 
@@ -31,6 +31,6 @@ abstract class AbstractCodeFragmentCollectDiagnosticsTest : AbstractCollectDiagn
             else -> factory.createExpressionCodeFragment(fragmentText, contextElement)
         }
 
-        super.doTestByFileStructure(codeFragment, module, testServices)
+        super.doTestByFileStructure(codeFragment, mainModule, testServices)
     }
 }
