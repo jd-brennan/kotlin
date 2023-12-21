@@ -473,6 +473,10 @@ object KotlinCompilerClient {
         val args = listOf(
             javaExecutable.absolutePath, "-cp", compilerId.compilerClasspath.joinToString(File.pathSeparator)
         ) +
+                listOf(
+                    "-XX:+UseParallelGC",
+                    "-XX:+UseCodeCacheFlushing",
+                ) +
                 platformSpecificOptions +
                 daemonJVMOptions.mappers.flatMap { it.toArgs("-") } +
                 javaIllegalAccessWorkaround +
