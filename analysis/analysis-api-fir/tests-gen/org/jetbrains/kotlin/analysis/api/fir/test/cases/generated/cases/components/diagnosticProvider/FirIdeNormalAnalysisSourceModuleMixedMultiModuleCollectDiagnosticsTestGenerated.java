@@ -46,4 +46,38 @@ public class FirIdeNormalAnalysisSourceModuleMixedMultiModuleCollectDiagnosticsT
     public void testAllFilesPresentInMixedMultiModule() throws Exception {
         KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("analysis/analysis-api/testData/components/diagnosticsProvider/mixedMultiModule"), Pattern.compile("^(.+)\\.kt$"), null, true);
     }
+
+    @Nested
+    @TestMetadata("analysis/analysis-api/testData/components/diagnosticsProvider/mixedMultiModule/when")
+    @TestDataPath("$PROJECT_ROOT")
+    public class When {
+        @Test
+        public void testAllFilesPresentInWhen() throws Exception {
+            KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("analysis/analysis-api/testData/components/diagnosticsProvider/mixedMultiModule/when"), Pattern.compile("^(.+)\\.kt$"), null, true);
+        }
+
+        @Test
+        @TestMetadata("sealedClassFromLibraryExhaustive.kt")
+        public void testSealedClassFromLibraryExhaustive() throws Exception {
+            runTest("analysis/analysis-api/testData/components/diagnosticsProvider/mixedMultiModule/when/sealedClassFromLibraryExhaustive.kt");
+        }
+
+        @Test
+        @TestMetadata("sealedClassFromLibraryMissingCase.kt")
+        public void testSealedClassFromLibraryMissingCase() throws Exception {
+            runTest("analysis/analysis-api/testData/components/diagnosticsProvider/mixedMultiModule/when/sealedClassFromLibraryMissingCase.kt");
+        }
+
+        @Test
+        @TestMetadata("sealedInterfaceFromLibraryExhaustive.kt")
+        public void testSealedInterfaceFromLibraryExhaustive() throws Exception {
+            runTest("analysis/analysis-api/testData/components/diagnosticsProvider/mixedMultiModule/when/sealedInterfaceFromLibraryExhaustive.kt");
+        }
+
+        @Test
+        @TestMetadata("sealedInterfaceFromLibraryMissingCase.kt")
+        public void testSealedInterfaceFromLibraryMissingCase() throws Exception {
+            runTest("analysis/analysis-api/testData/components/diagnosticsProvider/mixedMultiModule/when/sealedInterfaceFromLibraryMissingCase.kt");
+        }
+    }
 }
