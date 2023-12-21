@@ -74,11 +74,7 @@ abstract class DefaultCInteropSettings @Inject internal constructor(
 
     @Deprecated("Deprecated. Please, use definitionFile.", ReplaceWith("definitionFile"))
     val defFileProperty: Property<File> = params.services.objectFactory.property<File>().convention(
-        if (getDefaultCinteropDefinitionFile().exists()) {
-            getDefaultCinteropDefinitionFile()
-        } else {
-            null
-        }
+        getDefaultCinteropDefinitionFile().takeIf { it.exists() }
     )
 
     private fun getDefaultCinteropDefinitionFile(): File = params.services.projectLayout.projectDirectory.file("src/nativeInterop/cinterop/$name.def").asFile
