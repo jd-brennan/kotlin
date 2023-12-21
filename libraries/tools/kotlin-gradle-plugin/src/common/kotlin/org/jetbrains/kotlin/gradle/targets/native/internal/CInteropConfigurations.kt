@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPluginLifecycle.Stage.AfterFinal
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.categoryByName
 import org.jetbrains.kotlin.gradle.plugin.internal.artifactTypeAttribute
+import org.jetbrains.kotlin.gradle.plugin.internal.attributesCopyHelper
 import org.jetbrains.kotlin.gradle.plugin.launchInStage
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.plugin.usesPlatformOf
@@ -22,7 +23,6 @@ import org.jetbrains.kotlin.gradle.targets.KotlinTargetSideEffect
 import org.jetbrains.kotlin.gradle.targets.native.internal.CInteropKlibLibraryElements.cinteropKlibLibraryElements
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.utils.*
-import org.jetbrains.kotlin.gradle.utils.copyAttributes
 import org.jetbrains.kotlin.gradle.utils.createConsumable
 import org.jetbrains.kotlin.gradle.utils.findConsumable
 
@@ -57,7 +57,7 @@ internal fun Project.locateOrCreateCInteropDependencyConfiguration(
         /* Deferring attributes to wait for compilation.attributes to be configured  by user*/
         launchInStage(AfterFinaliseDsl) {
             usesPlatformOf(compilation.target)
-            copyAttributes(compilation.attributes, attributes)
+            project.attributesCopyHelper.copyAttributes(compilation.attributes, attributes)
             attributes.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, cinteropKlibLibraryElements())
             attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_CINTEROP))
             attributes.attribute(Category.CATEGORY_ATTRIBUTE, project.categoryByName(Category.LIBRARY))
@@ -81,7 +81,7 @@ internal fun Project.locateOrCreateCInteropApiElementsConfiguration(target: Kotl
         /* Deferring attributes to wait for target.attributes to be configured by user */
         launchInStage(AfterFinaliseDsl) {
             usesPlatformOf(target)
-            copyAttributes(target.attributes, attributes)
+            project.attributesCopyHelper.copyAttributes(target.attributes, attributes)
             attributes.attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, cinteropKlibLibraryElements())
             attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, KotlinUsages.KOTLIN_CINTEROP))
             attributes.attribute(Category.CATEGORY_ATTRIBUTE, project.categoryByName(Category.LIBRARY))

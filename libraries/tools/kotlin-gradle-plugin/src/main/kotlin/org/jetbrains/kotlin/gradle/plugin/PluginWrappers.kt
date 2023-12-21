@@ -162,4 +162,5 @@ private fun Project.registerVariantImplementations() {
     factories[ConfigurationCacheStartParameterAccessor.Factory::class] = ConfigurationCacheStartParameterAccessorG6.Factory()
     factories[SourceSetCompatibilityHelper.SourceSetCompatibilityHelperVariantFactory::class] =
         SourceSetCompatibilityHelperG6VariantFactory()
+    factories[AttributesCopyHelper.AttributeCopyHelperVariantFactory::class] = AttributeCopyHelperVariantFactoryG6()
 }

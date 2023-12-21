@@ -15,8 +15,8 @@ import org.gradle.api.internal.component.UsageContext
 import org.gradle.api.internal.project.ProjectInternal
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginLifecycle
 import org.jetbrains.kotlin.gradle.plugin.KotlinTargetComponent
+import org.jetbrains.kotlin.gradle.plugin.internal.attributesCopyHelper
 import org.jetbrains.kotlin.gradle.plugin.launchInStage
-import org.jetbrains.kotlin.gradle.utils.copyAttributes
 import org.jetbrains.kotlin.gradle.utils.createDependencyScope
 import org.jetbrains.kotlin.gradle.utils.findDependencyScope
 import org.jetbrains.kotlin.tooling.core.UnsafeApi
@@ -39,7 +39,10 @@ internal fun KotlinTargetSoftwareComponent(
                     publishedConfiguration.isVisible = false
                     publishedConfiguration.extendsFrom(project.configurations.getByName(kotlinUsageContext.dependencyConfigurationName))
                     publishedConfiguration.artifacts.addAll(kotlinUsageContext.artifacts)
-                    copyAttributes(from = kotlinUsageContext.attributes, to = publishedConfiguration.attributes)
+                    project.attributesCopyHelper.copyAttributes(
+                        from = kotlinUsageContext.attributes,
+                        to = publishedConfiguration.attributes
+                    )
                 }
 
             adhocVariant.addVariantsFromConfiguration(configuration) { configurationVariantDetails ->

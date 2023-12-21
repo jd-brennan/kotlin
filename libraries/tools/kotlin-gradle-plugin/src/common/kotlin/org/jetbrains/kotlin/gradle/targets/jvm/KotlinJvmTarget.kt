@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.gradle.plugin.diagnostics.KotlinToolingDiagnostics
 import org.jetbrains.kotlin.gradle.plugin.diagnostics.reportDiagnostic
 import org.jetbrains.kotlin.gradle.plugin.internal.JavaSourceSetsAccessor
 import org.jetbrains.kotlin.gradle.plugin.internal.SourceSetCompatibilityHelper
+import org.jetbrains.kotlin.gradle.plugin.internal.attributesCopyHelper
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinOnlyTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.internal
@@ -312,6 +313,7 @@ abstract class KotlinJvmTarget @Inject constructor(
                 ?.takeIf { project.configurations.findByName(it) != null }
         } else null
 
+        val attributesCopyHelper = project.attributesCopyHelper
         listOfNotNull(
             compileConfigurationName,
             javaSourceSet.compileClasspathConfigurationName,
@@ -324,7 +326,7 @@ abstract class KotlinJvmTarget @Inject constructor(
         ).mapNotNull {
             project.configurations.findByName(it)
         }.forEach { configuration ->
-            copyAttributes(attributes, configuration.attributes)
+            attributesCopyHelper.copyAttributes(attributes, configuration.attributes)
         }
     }
 

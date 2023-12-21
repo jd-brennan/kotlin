@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.gradle.plugin.mpp.compilationImpl.factory
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.internal.attributesCopyHelper
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinWithJavaTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.compilationImpl.DefaultKotlinCompilationConfigurationsContainer
@@ -178,7 +179,10 @@ private fun KotlinCompilationDependencyConfigurationsContainer(
             isVisible = false
             description = "Host-specific Metadata dependencies for $compilationCoordinates"
             extendsFrom(compileDependencyConfiguration)
-            copyAttributes(from = compileDependencyConfiguration.attributes, to = attributes)
+            target.project.attributesCopyHelper.copyAttributes(
+                from = compileDependencyConfiguration.attributes,
+                to = attributes
+            )
             attributes {
                 it.attribute(Usage.USAGE_ATTRIBUTE, target.project.usageByName(KotlinUsages.KOTLIN_METADATA))
             }

@@ -10,8 +10,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginLifecycle.Stage.AfterEvaluateBuildscript
 import org.jetbrains.kotlin.gradle.plugin.KotlinProjectSetupCoroutine
 import org.jetbrains.kotlin.gradle.plugin.await
+import org.jetbrains.kotlin.gradle.plugin.internal.attributesCopyHelper
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrCompilation
-import org.jetbrains.kotlin.gradle.utils.copyAttributes
 import org.jetbrains.kotlin.gradle.utils.forAllTargets
 
 
@@ -22,10 +22,14 @@ import org.jetbrains.kotlin.gradle.utils.forAllTargets
  */
 internal val UserDefinedAttributesSetupAction = KotlinProjectSetupCoroutine {
     AfterEvaluateBuildscript.await()
+    val attributesCopyHelper = project.attributesCopyHelper
     kotlinExtension.forAllTargets { target ->
         target.internal.kotlinComponents.flatMap { it.internal.usages }.forEach { usage ->
             val dependencyConfiguration = target.project.configurations.findByName(usage.dependencyConfigurationName) ?: return@forEach
-            copyAttributes(usage.compilation.attributes, dependencyConfiguration.attributes)
+            attributesCopyHelper.copyAttributes(
+                usage.compilation.attributes,
+                dependencyConfiguration.attributes
+            )
         }
 
         target.compilations.all { compilation ->
@@ -33,14 +37,19 @@ internal val UserDefinedAttributesSetupAction = KotlinProjectSetupCoroutine {
 
             compilation.allOwnedConfigurationsNames
                 .mapNotNull { configurationName -> project.configurations.findByName(configurationName) }
-                .forEach { configuration -> copyAttributes(compilationAttributes, configuration.attributes) }
+                .forEach { configuration ->
+                    attributesCopyHelper.copyAttributes(compilationAttributes, configuration.attributes)
+                }
         }
 
         // Copy to host-specific metadata elements configurations
         if (target is KotlinNativeTarget) {
             val hostSpecificMetadataElements = project.configurations.findByName(target.hostSpecificMetadataElementsConfigurationName)
             if (hostSpecificMetadataElements != null) {
-                copyAttributes(from = target.attributes, to = hostSpecificMetadataElements.attributes)
+                attributesCopyHelper.copyAttributes(
+                    from = target.attributes,
+                    to = hostSpecificMetadataElements.attributes
+                )
             }
         }
     }

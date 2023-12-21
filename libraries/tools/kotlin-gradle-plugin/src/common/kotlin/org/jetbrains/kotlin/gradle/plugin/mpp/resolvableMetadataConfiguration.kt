@@ -13,6 +13,7 @@ import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.dsl.multiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.categoryByName
+import org.jetbrains.kotlin.gradle.plugin.internal.attributesCopyHelper
 import org.jetbrains.kotlin.gradle.plugin.sources.*
 import org.jetbrains.kotlin.gradle.plugin.sources.InternalKotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.sources.disambiguateName
@@ -60,7 +61,10 @@ internal val InternalKotlinSourceSet.resolvableMetadataConfiguration: Configurat
 
     /* Ensure consistent dependency resolution result within the whole module */
     configuration.shouldResolveConsistentlyWith(allCompileMetadataConfiguration)
-    copyAttributes(allCompileMetadataConfiguration.attributes, configuration.attributes)
+    project.attributesCopyHelper.copyAttributes(
+        allCompileMetadataConfiguration.attributes,
+        configuration.attributes
+    )
 
     configureMetadataDependenciesConfigurations(configuration)
 

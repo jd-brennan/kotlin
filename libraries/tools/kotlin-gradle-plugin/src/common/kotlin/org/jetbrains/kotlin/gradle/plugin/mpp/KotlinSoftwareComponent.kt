@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.ProjectLocalConfigurations
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPropertiesProvider
 import org.jetbrains.kotlin.gradle.plugin.await
+import org.jetbrains.kotlin.gradle.plugin.internal.attributesCopyHelper
 import org.jetbrains.kotlin.gradle.plugin.mpp.DefaultKotlinUsageContext.PublishOnlyIf
 import org.jetbrains.kotlin.gradle.targets.metadata.*
 import org.jetbrains.kotlin.gradle.utils.*
@@ -208,13 +209,15 @@ class DefaultKotlinUsageContext(
          */
         val result = project.configurations.detachedResolvable().attributes
 
-        // Capture type parameter T:
-        fun <T> copyAttribute(attribute: Attribute<T>, from: AttributeContainer, to: AttributeContainer) {
-            to.attribute<T>(attribute, from.getAttribute(attribute)!!)
-        }
-
+        val attributesCopyHelper = project.attributesCopyHelper
         filterOutNonPublishableAttributes(configurationAttributes.keySet())
-            .forEach { copyAttribute(it, configurationAttributes, result) }
+            .forEach {
+                attributesCopyHelper.copyAttribute(
+                    from = configurationAttributes,
+                    to = result,
+                    key = it
+                )
+            }
 
         return result
     }

@@ -182,6 +182,11 @@ abstract class DefaultKotlinBasePlugin : KotlinBasePlugin {
             SourceSetCompatibilityHelper.SourceSetCompatibilityHelperVariantFactory::class,
             DefaultSourceSetCompatibilityHelperVariantFactory()
         )
+
+        factories.putIfAbsent(
+            AttributesCopyHelper.AttributeCopyHelperVariantFactory::class,
+            DefaultAttributeCopyHelperVariantFactory()
+        )
     }
 
     protected fun setupAttributeMatchingStrategy(
