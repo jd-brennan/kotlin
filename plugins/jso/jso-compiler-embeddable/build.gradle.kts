@@ -3,15 +3,15 @@ plugins {
 }
 
 dependencies {
-    embedded(project(":kotlinx-jso-compiler-plugin")) { isTransitive = false }
+    embedded(project(":plugins:jso:jso-compiler")) { isTransitive = false }
 }
 
 publish()
 
 runtimeJar(rewriteDefaultJarDepsToShadedCompiler())
 sourcesJarWithSourcesFromEmbedded(
-    project(":kotlinx-jso-compiler-plugin").tasks.named<Jar>("sourcesJar")
+    project(":plugins:jso:jso-compiler").tasks.named<Jar>("sourcesJar")
 )
 javadocJarWithJavadocFromEmbedded(
-    project(":kotlinx-jso-compiler-plugin").tasks.named<Jar>("javadocJar")
+    project(":plugins:jso:jso-compiler").tasks.named<Jar>("javadocJar")
 )

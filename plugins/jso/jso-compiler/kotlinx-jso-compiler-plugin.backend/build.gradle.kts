@@ -10,7 +10,7 @@ dependencies {
     compileOnly(project(":compiler:ir.backend.common"))
     compileOnly(project(":compiler:ir.tree"))
 
-    implementation(project(":kotlinx-jso-compiler-plugin.common"))
+    implementation(project(":plugins:jso:jso-compiler:kotlinx-jso-compiler-plugin.common"))
 
     compileOnly(intellijCore())
 }

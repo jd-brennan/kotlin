@@ -872,6 +872,7 @@ tasks {
         dependsOn(":plugins:fir-plugin-prototype:fir-plugin-ic-test:test")
         dependsOn(":kotlin-imports-dumper-compiler-plugin:test")
         dependsOn(":plugins:jvm-abi-gen:test")
+        dependsOn(":plugins:jso:jso-compiler:test")
         dependsOn(":kotlinx-serialization-compiler-plugin:test")
         dependsOn(":kotlin-lombok-compiler-plugin:test")
         dependsOn(":kotlin-noarg-compiler-plugin:test")

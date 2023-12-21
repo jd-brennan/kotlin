@@ -13,7 +13,7 @@ dependencies {
     compileOnly(project(":compiler:fir:entrypoint"))
     compileOnly(project(":compiler:cli-common"))
 
-    implementation(project(":kotlinx-jso-compiler-plugin.common"))
+    implementation(project(":plugins:jso:jso-compiler:kotlinx-jso-compiler-plugin.common"))
 
     compileOnly(intellijCore())
 
@@ -30,5 +30,5 @@ sourcesJar()
 javadocJar()
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+    compilerOptions.freeCompilerArgs.add("-Xcontext-receivers")
 }

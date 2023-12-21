@@ -18,14 +18,14 @@ val jsoIrRuntimeForTests by configurations.creating {
 }
 
 dependencies {
-    embedded(project(":kotlinx-jso-compiler-plugin.common")) { isTransitive = false }
-    embedded(project(":kotlinx-jso-compiler-plugin.k2")) { isTransitive = false }
-    embedded(project(":kotlinx-jso-compiler-plugin.cli")) { isTransitive = false }
-    embedded(project(":kotlinx-jso-compiler-plugin.backend")) { isTransitive = false }
+    embedded(project(":plugins:jso:jso-compiler:kotlinx-jso-compiler-plugin.common")) { isTransitive = false }
+    embedded(project(":plugins:jso:jso-compiler:kotlinx-jso-compiler-plugin.k2")) { isTransitive = false }
+    embedded(project(":plugins:jso:jso-compiler:kotlinx-jso-compiler-plugin.cli")) { isTransitive = false }
+    embedded(project(":plugins:jso:jso-compiler:kotlinx-jso-compiler-plugin.backend")) { isTransitive = false }
 
     testApi(project(":compiler:backend"))
     testApi(project(":compiler:cli"))
-    testApi(project(":kotlinx-jso-compiler-plugin.cli"))
+    testApi(project(":plugins:jso:jso-compiler:kotlinx-jso-compiler-plugin.cli"))
 
     testApi(projectTests(":compiler:test-infrastructure"))
     testApi(projectTests(":compiler:test-infrastructure-utils"))
@@ -39,9 +39,9 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
 
-    jsoIrRuntimeForTests(project(":kotlinx-jso-runtime")) { isTransitive = false }
+    jsoIrRuntimeForTests(project(":plugins:jso:jso-runtime")) { isTransitive = false }
 
-    embedded(project(":kotlinx-jso-runtime")) {
+    embedded(project(":plugins:jso:jso-runtime")) {
         attributes {
             attribute(KotlinPlatformType.attribute, KotlinPlatformType.js)
             attribute(KotlinJsCompilerAttribute.jsCompilerAttribute, KotlinJsCompilerAttribute.ir)

@@ -1,6 +1,5 @@
 import plugins.configureDefaultPublishing
 import plugins.configureKotlinPomAttributes
-import plugins.signLibraryPublication
 
 description = "Runtime library for the JSO compiler plugin"
 
@@ -11,18 +10,11 @@ plugins {
 
 group = "org.jetbrains.kotlin"
 
-repositories {
-    mavenCentral()
-}
-
 kotlin {
     js {
         browser()
         nodejs()
-    }
-
-    sourceSets {
-        js().compilations["main"].defaultSourceSet {
+        compilations["main"].defaultSourceSet {
             dependencies {
                 compileOnly(kotlin("stdlib-js"))
             }
@@ -30,7 +22,7 @@ kotlin {
     }
 }
 
-val emptyJavadocJar by tasks.creating(Jar::class) {
+val emptyJavadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")
 }
 

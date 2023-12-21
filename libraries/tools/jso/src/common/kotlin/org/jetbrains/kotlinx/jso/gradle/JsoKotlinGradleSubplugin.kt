@@ -16,11 +16,8 @@
 
 package org.jetbrains.kotlinx.jso.gradle
 
-import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.plugin.*
-
-private const val EXTENSION_NAME = "jsoCompilerPlugin"
 
 class JsoKotlinGradleSubplugin : KotlinCompilerPluginSupportPlugin {
     companion object {
