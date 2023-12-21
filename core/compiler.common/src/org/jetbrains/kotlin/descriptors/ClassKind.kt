@@ -15,16 +15,20 @@
  */
 package org.jetbrains.kotlin.descriptors
 
-enum class ClassKind(val codeRepresentation: String?) {
+enum class ClassKind(val representation: String) {
     CLASS( "class"),
     INTERFACE("interface"),
     ENUM_CLASS( "enum class"),
-    ENUM_ENTRY( null),
+    ENUM_ENTRY( "enum entry"),
     ANNOTATION_CLASS( "annotation class"),
     OBJECT("object");
 
     val isSingleton: Boolean
         get() = this == OBJECT || this == ENUM_ENTRY
+
+    override fun toString(): String {
+        return representation
+    }
 }
 
 inline val ClassKind.isClass: Boolean

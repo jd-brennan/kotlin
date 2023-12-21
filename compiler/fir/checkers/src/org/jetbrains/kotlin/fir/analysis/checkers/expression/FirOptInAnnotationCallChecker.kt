@@ -60,7 +60,7 @@ object FirOptInAnnotationCallChecker : FirAnnotationCallChecker() {
                 }
                 val modality = declaration.modality()
                 if (modality == Modality.FINAL || modality == Modality.SEALED) {
-                    reporter.reportOn(expression.source, FirErrors.SUBCLASS_OPT_IN_INAPPLICABLE, "$modality $kind", context)
+                    reporter.reportOn(expression.source, FirErrors.SUBCLASS_OPT_IN_INAPPLICABLE, "${modality.name.lowercase()} $kind", context)
                     return
                 }
                 if (declaration.isFun) {
