@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.fir.declarations.utils.modality
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.languageVersionSettings
 import org.jetbrains.kotlin.fir.references.FirErrorNamedReference
+import org.jetbrains.kotlin.fir.references.FirResolvedErrorReference
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
 import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
@@ -257,7 +258,7 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
 
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: Nothing?): ConstantArgumentKind {
         val calleeReference = functionCall.calleeReference
-        if (calleeReference is FirErrorNamedReference) {
+        if (calleeReference is FirErrorNamedReference || calleeReference is FirResolvedErrorReference) {
             return ConstantArgumentKind.VALID_CONST
         }
         if (functionCall.getExpandedType().classId == StandardClassIds.KClass) {
