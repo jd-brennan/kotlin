@@ -41908,6 +41908,12 @@ public class LLFirPreresolvedReversedDiagnosticCompilerFE10TestDataTestGenerated
                 }
 
                 @Test
+                @TestMetadata("twoModules.kt")
+                public void testTwoModules() throws Exception {
+                    runTest("compiler/testData/diagnostics/testsWithStdLib/annotations/subclassOptInRequired/twoModules.kt");
+                }
+
+                @Test
                 @TestMetadata("UsageOptInIsNotImplied.kt")
                 public void testUsageOptInIsNotImplied() throws Exception {
                     runTest("compiler/testData/diagnostics/testsWithStdLib/annotations/subclassOptInRequired/UsageOptInIsNotImplied.kt");
