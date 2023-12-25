@@ -1334,6 +1334,11 @@ public class KlibIrTextTestCaseGenerated extends AbstractKlibIrTextTestCase {
             runTest("compiler/testData/ir/irText/expressions/ifElseIf.kt");
         }
 
+        @TestMetadata("ifWithAssignment.kt")
+        public void testIfWithAssignment() throws Exception {
+            runTest("compiler/testData/ir/irText/expressions/ifWithAssignment.kt");
+        }
+
         @TestMetadata("implicitCastInReturnFromConstructor.kt")
         public void testImplicitCastInReturnFromConstructor() throws Exception {
             runTest("compiler/testData/ir/irText/expressions/implicitCastInReturnFromConstructor.kt");

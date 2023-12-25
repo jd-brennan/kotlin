@@ -862,7 +862,7 @@ class Fir2IrVisitor(
     override fun visitVariableAssignment(
         variableAssignment: FirVariableAssignment,
         data: Any?
-    ): IrElement = whileAnalysing(session, variableAssignment) {
+    ): IrExpression = whileAnalysing(session, variableAssignment) {
         val explicitReceiverExpression = variableAssignment.explicitReceiver?.let { receiverExpression ->
             convertToIrReceiverExpression(
                 receiverExpression, variableAssignment.unwrapLValue()!!
@@ -1115,10 +1115,14 @@ class Fir2IrVisitor(
     ): IrExpression {
         if (size == 1) {
             val firStatement = single()
-            if (firStatement is FirExpression &&
-                (firStatement !is FirBlock || firStatement.source?.kind != KtFakeSourceElementKind.DesugaredForLoop)
-            ) {
-                return convertToIrExpression(firStatement)
+            when {
+                firStatement is FirVariableAssignment -> {
+                    return visitVariableAssignment(firStatement, data = null)
+                }
+                firStatement is FirExpression &&
+                        (firStatement !is FirBlock || firStatement.source?.kind != KtFakeSourceElementKind.DesugaredForLoop) -> {
+                    return convertToIrExpression(firStatement)
+                }
             }
         }
         return convertToIrBlock(source, origin, forceUnitType = origin?.isLoop == true)

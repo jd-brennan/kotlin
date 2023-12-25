@@ -1605,6 +1605,12 @@ public class ClassicJvmIrTextTestGenerated extends AbstractClassicJvmIrTextTest 
         }
 
         @Test
+        @TestMetadata("ifWithAssignment.kt")
+        public void testIfWithAssignment() throws Exception {
+            runTest("compiler/testData/ir/irText/expressions/ifWithAssignment.kt");
+        }
+
+        @Test
         @TestMetadata("implicitCastInReturnFromConstructor.kt")
         public void testImplicitCastInReturnFromConstructor() throws Exception {
             runTest("compiler/testData/ir/irText/expressions/implicitCastInReturnFromConstructor.kt");

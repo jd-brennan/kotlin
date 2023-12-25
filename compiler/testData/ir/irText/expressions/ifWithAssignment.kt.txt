@@ -1,0 +1,34 @@
+fun topLevelMethod() {
+  var z: Int = 1
+  when {
+    true -> { // BLOCK
+      z = 2
+    }
+    else -> { // BLOCK
+      z = 3
+    }
+  }
+  when {
+    true -> z = 4
+    else -> z = 5
+  }
+  { // BLOCK
+    val tmp_0: Int = z
+    when {
+      EQEQ(arg0 = tmp_0, arg1 = 1) -> { // BLOCK
+        z = 6
+      }
+      else -> { // BLOCK
+        z = 7
+      }
+    }
+  }
+  { // BLOCK
+    val tmp_1: Int = z
+    when {
+      EQEQ(arg0 = tmp_1, arg1 = 1) -> z = 8
+      else -> z = 9
+    }
+  }
+}
+
