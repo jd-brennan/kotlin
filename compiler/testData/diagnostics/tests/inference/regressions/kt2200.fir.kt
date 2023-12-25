@@ -15,4 +15,4 @@ fun main() {
 
 //from library
 @Suppress("UNCHECKED_CAST")
-fun <T> array(vararg t : <!CANNOT_INFER_PARAMETER_TYPE!>T<!>) : Array<T> = t as Array<T>
+fun <T> array(vararg t : T) : Array<T> = t as Array<T>
