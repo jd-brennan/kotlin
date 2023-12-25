@@ -12,7 +12,7 @@ class SourceSetsBuilder(val project: Project) {
     inline operator fun String.invoke(crossinline body: SourceSet.() -> Unit): SourceSet {
         val sourceSetName = this
         return project.sourceSets.maybeCreate(sourceSetName).apply {
-            none()
+            //none()
             body()
         }
     }
