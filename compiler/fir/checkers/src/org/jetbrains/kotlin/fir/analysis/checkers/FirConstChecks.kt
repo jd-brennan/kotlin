@@ -347,7 +347,7 @@ private class FirConstCheckVisitor(private val session: FirSession) : FirVisitor
         return this?.callableId?.packageName?.asString() == "kotlin"
     }
 
-    fun FirCallableSymbol<*>?.getReferencedClassSymbol(): FirBasedSymbol<*>? =
+    private fun FirCallableSymbol<*>?.getReferencedClassSymbol(): FirBasedSymbol<*>? =
         this?.resolvedReturnTypeRef
             ?.coneTypeSafe<ConeLookupTagBasedType>()
             ?.lookupTag
