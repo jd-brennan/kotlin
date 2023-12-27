@@ -7,38 +7,48 @@ package org.jetbrains.kotlin.backend.wasm.lower
 
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
+import org.jetbrains.kotlin.backend.common.lower.irNot
 import org.jetbrains.kotlin.backend.wasm.WasmBackendContext
 import org.jetbrains.kotlin.backend.wasm.ir2wasm.isExported
-import org.jetbrains.kotlin.ir.builders.irCall
-import org.jetbrains.kotlin.ir.builders.irComposite
-import org.jetbrains.kotlin.ir.builders.irTry
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.jetbrains.kotlin.ir.builders.*
+import org.jetbrains.kotlin.ir.builders.declarations.buildVariable
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
+import org.jetbrains.kotlin.ir.util.toIrConst
 import org.jetbrains.kotlin.js.config.JSConfigurationKeys
 import org.jetbrains.kotlin.js.config.WasmTarget
+import org.jetbrains.kotlin.name.Name
 
 // This pass needed to call coroutines event loop run after exported functions calls
-// @JsExport
+// @WasmExport
 // fun someExportedMethod() {
 //     println("hello world")
 // }
 //
 // converts into
 //
-// @JsExport
+// @WasmExport
 // fun someExportedMethod() {
+//     val currentIsNotFirstWasmExportCall = isNotFirstWasmExportCall
 //     try {
+//         isNotFirstWasmExportCall = true
 //         println("hello world")
 //     } finally {
-//         invokeOnExportedFunctionExit()
+//         isNotFirstWasmExportCall = currentIsNotFirstWasmExportCall
+//         if (!currentIsNotFirstWasmExportCall) invokeOnExportedFunctionExit()
 //     }
 // }
 
 internal class InvokeOnExportedFunctionExitLowering(val context: WasmBackendContext) : FileLoweringPass {
     private val invokeOnExportedFunctionExit get() = context.wasmSymbols.invokeOnExportedFunctionExit
     private val isWasi = context.configuration.get(JSConfigurationKeys.WASM_TARGET, WasmTarget.JS) == WasmTarget.WASI
+    private val irBooleanType = context.wasmSymbols.irBuiltIns.booleanType
+    private val isNotFirstWasmExportCallGetter = context.wasmSymbols.isNotFirstWasmExportCall.owner.getter!!.symbol
+    private val isNotFirstWasmExportCallSetter = context.wasmSymbols.isNotFirstWasmExportCall.owner.setter!!.symbol
 
     private fun processExportFunction(irFunction: IrFunction) {
         val body = irFunction.body ?: return
@@ -51,7 +61,19 @@ internal class InvokeOnExportedFunctionExitLowering(val context: WasmBackendCont
         }
 
         with(context.createIrBuilder(irFunction.symbol)) {
+            val currentIsNotFirstWasmExportCall = buildVariable(
+                parent = irFunction,
+                startOffset = UNDEFINED_OFFSET, endOffset = UNDEFINED_OFFSET,
+                origin = IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
+                name = Name.identifier("currentIsNotFirstWasmExportCall"),
+                type = irBooleanType
+            )
+
+            currentIsNotFirstWasmExportCall.initializer =
+                irGet(irBooleanType, null, isNotFirstWasmExportCallGetter)
+
             val tryBody = irComposite {
+                +irSet(irBooleanType, null, isNotFirstWasmExportCallSetter, true.toIrConst(irBooleanType))
                 when (body) {
                     is IrBlockBody -> body.statements.forEach { +it }
                     is IrExpressionBody -> +body.expression
@@ -59,17 +81,35 @@ internal class InvokeOnExportedFunctionExitLowering(val context: WasmBackendCont
                 }
             }
 
+            val finally = irComposite(resultType = context.irBuiltIns.unitType) {
+                +irSet(
+                    type = irBooleanType,
+                    receiver = null,
+                    setterSymbol = isNotFirstWasmExportCallSetter,
+                    value = irGet(currentIsNotFirstWasmExportCall, irBooleanType)
+                )
+                +irIfThen(
+                    type = context.irBuiltIns.unitType,
+                    condition = irNot(irGet(currentIsNotFirstWasmExportCall, irBooleanType)),
+                    thenPart = irCall(invokeOnExportedFunctionExit),
+                )
+            }
+
             val tryWrap = irTry(
                 type = bodyType,
                 tryResult = tryBody,
                 catches = emptyList(),
-                finallyExpression = irCall(invokeOnExportedFunctionExit)
+                finallyExpression = finally
             )
 
             when (body) {
-                is IrExpressionBody -> body.expression = tryWrap
+                is IrExpressionBody -> body.expression = irComposite {
+                    +currentIsNotFirstWasmExportCall
+                    +tryWrap
+                }
                 is IrBlockBody -> with(body.statements) {
                     clear()
+                    add(currentIsNotFirstWasmExportCall)
                     add(tryWrap)
                 }
                 else -> TODO(this::class.qualifiedName!!)
