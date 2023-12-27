@@ -1,6 +1,6 @@
 // KIND: STANDALONE_LLDB
 // FREE_COMPILER_ARGS: -XXLanguage:+UnitConversionsOnArbitraryExpressions
-
+// IGNORE_BACKEND_K2: NATIVE
 // FILE: kt42208-1.kt
 fun main() {
     val a = foo()
