@@ -345,7 +345,7 @@ private fun Path.deleteRecursivelyImpl(): List<Exception> {
             if (stream is SecureDirectoryStream<Path>) {
                 useInsecure = false
                 collector.path = parent
-                stream.handleEntry(this.fileName, collector)
+                stream.handleEntry(this.fileName, null, collector)
             }
         }
     }
@@ -371,10 +371,16 @@ private inline fun <R> tryIgnoreNoSuchFileException(function: () -> R): R? {
 
 // secure walk
 
-private fun SecureDirectoryStream<Path>.handleEntry(name: Path, collector: ExceptionsCollector) {
+private fun SecureDirectoryStream<Path>.handleEntry(name: Path, parent: Path?, collector: ExceptionsCollector) {
     collector.enterEntry(name)
 
     collectIfThrows(collector) {
+        if (parent != null) {
+            // Check only for entries inside a directory
+            val entry = collector.path!!
+            entry.checkFileName()
+            entry.checkNotSameAs(parent)
+        }
         if (this.isDirectory(name, LinkOption.NOFOLLOW_LINKS)) {
             val preEnterTotalExceptions = collector.totalExceptions
 
@@ -399,7 +405,7 @@ private fun SecureDirectoryStream<Path>.enterDirectory(name: Path, collector: Ex
             this.newDirectoryStream(name, LinkOption.NOFOLLOW_LINKS)
         }?.use { directoryStream ->
             for (entry in directoryStream) {
-                directoryStream.handleEntry(entry.fileName, collector)
+                directoryStream.handleEntry(entry.fileName, collector.path, collector)
             }
         }
     }
