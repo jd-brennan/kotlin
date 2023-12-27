@@ -76,6 +76,12 @@ public class LldbTestGenerated extends AbstractNativeBlackBoxTest {
     }
 
     @Test
+    @TestMetadata("dataClassCopyMethod.kt")
+    public void testDataClassCopyMethod() throws Exception {
+        runTest("native/native.tests/testData/lldb/dataClassCopyMethod.kt");
+    }
+
+    @Test
     @TestMetadata("kt33055.kt")
     public void testKt33055() throws Exception {
         runTest("native/native.tests/testData/lldb/kt33055.kt");
