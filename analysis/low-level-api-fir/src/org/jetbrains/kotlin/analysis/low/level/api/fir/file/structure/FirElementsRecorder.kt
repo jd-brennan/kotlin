@@ -147,7 +147,9 @@ internal open class FirElementsRecorder : FirVisitor<Unit, MutableMap<KtElement,
     private fun KtSourceElement.isSourceForCompoundAccess(fir: FirElement): Boolean {
         val psi = psi
         val parentPsi = psi?.parent
-        if (kind != KtFakeSourceElementKind.DesugaredCompoundAssignment && kind != KtFakeSourceElementKind.DesugaredIncrementOrDecrement) return false
+        if (kind != KtFakeSourceElementKind.DesugaredCompoundAssignment && kind !is KtFakeSourceElementKind.DesugaredIncrementOrDecrement) {
+            return false
+        }
         return when {
             psi is KtBinaryExpression || psi is KtUnaryExpression -> fir.isWriteInCompoundCall()
             parentPsi is KtBinaryExpression && psi == parentPsi.left -> fir.isReadInCompoundCall()

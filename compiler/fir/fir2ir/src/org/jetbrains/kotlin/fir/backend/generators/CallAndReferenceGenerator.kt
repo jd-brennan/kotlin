@@ -518,7 +518,8 @@ class CallAndReferenceGenerator(
                                     getterSymbol,
                                     typeArgumentsCount = property.typeParameters.size,
                                     valueArgumentsCount = property.contextReceivers.size,
-                                    origin = IrStatementOrigin.GET_PROPERTY,
+                                    origin = incOrDeclSourceKindToIrStatementOrigin[qualifiedAccess.source?.kind]
+                                        ?: IrStatementOrigin.GET_PROPERTY,
                                     superQualifierSymbol = dispatchReceiver?.superQualifierSymbol()
                                 )
                             }
@@ -549,7 +550,7 @@ class CallAndReferenceGenerator(
                             variable.irTypeForPotentiallyComponentCall(predefinedType = irType),
                             symbol,
                             origin = if (variableAsFunctionMode) IrStatementOrigin.VARIABLE_AS_FUNCTION
-                            else calleeReference.statementOrigin()
+                            else incOrDeclSourceKindToIrStatementOrigin[qualifiedAccess.source?.kind] ?: calleeReference.statementOrigin()
                         )
                     }
 

@@ -14,6 +14,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.tree.IElementType
 import com.intellij.util.diff.FlyweightCapableTreeStructure
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.getElementTextWithContext
 
 sealed class KtSourceElementKind {
@@ -146,10 +147,16 @@ sealed class KtFakeSourceElementKind(final override val shouldSkipErrorTypeRepor
 
     // x++ -> x = x.inc()
     // x = x++ -> x = { val <unary> = x; x = <unary>.inc(); <unary> }
-    object DesugaredIncrementOrDecrement : KtFakeSourceElementKind()
+    sealed class DesugaredIncrementOrDecrement : KtFakeSourceElementKind()
+    object DesugaredPrefixInc : DesugaredIncrementOrDecrement()
+    object DesugaredPrefixDec : DesugaredIncrementOrDecrement()
+    object DesugaredPostfixInc : DesugaredIncrementOrDecrement()
+    object DesugaredPostfixDec : DesugaredIncrementOrDecrement()
 
     // In ++a[1], a.get(1) will be called twice. This kind is used for the second call reference.
-    object DesugaredPrefixSecondGetReference : KtFakeSourceElementKind()
+    sealed class DesugaredPrefixSecondGetReference : KtFakeSourceElementKind()
+    object DesugaredPrefixIncSecondGetReference : DesugaredPrefixSecondGetReference()
+    object DesugaredPrefixDecSecondGetReference : DesugaredPrefixSecondGetReference()
 
     // ++x --> `inc` calleeReference
     object DesugaredPrefixNameReference : KtFakeSourceElementKind()
@@ -607,3 +614,17 @@ inline fun LighterASTNode.toKtLightSourceElement(
     startOffset: Int = this.startOffset,
     endOffset: Int = this.endOffset
 ): KtLightSourceElement = KtLightSourceElement(this, startOffset, endOffset, tree, kind)
+
+fun sourceKindForIncOrDec(operation: Name, isPrefix: Boolean) = when (operation.identifier) {
+    "inc" -> if (isPrefix) {
+        KtFakeSourceElementKind.DesugaredPrefixInc
+    } else {
+        KtFakeSourceElementKind.DesugaredPostfixInc
+    }
+    "dec" -> if (isPrefix) {
+        KtFakeSourceElementKind.DesugaredPrefixDec
+    } else {
+        KtFakeSourceElementKind.DesugaredPostfixDec
+    }
+    else -> error("Unexpected operator: ${operation.identifier}")
+}
