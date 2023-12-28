@@ -7,11 +7,11 @@ package org.jetbrains.kotlin.gradle.mpp
 
 import org.gradle.api.logging.LogLevel
 import org.gradle.util.GradleVersion
+import org.jetbrains.kotlin.build.report.metrics.BuildAttribute
 import org.jetbrains.kotlin.gradle.testbase.*
 import org.jetbrains.kotlin.gradle.util.replaceWithVersion
 import org.jetbrains.kotlin.test.TestMetadata
 import org.junit.jupiter.api.DisplayName
-import kotlin.io.path.appendText
 
 @MppGradlePluginTests
 @DisplayName("Tests for IC with compatible overloads in common and platform sourceSets")
@@ -34,9 +34,9 @@ class CommonCodeWithPlatformSymbolsIT : KGPBaseTest() {
      */
 
     @GradleTest
-    @DisplayName("kt-62686-mpp-jvm-expect-new-dep")
+    @DisplayName("Use member function of an expect class that is overloaded in the actual class")
     @TestMetadata("kt-62686-mpp-jvm-expect-dep")
-    fun testKt62686v1(gradleVersion: GradleVersion) {
+    fun testIncrementalBuildWithOverloadedMemberFunction(gradleVersion: GradleVersion) {
         project(
             "kt-62686-mpp-jvm-expect-dep", gradleVersion
         ) {
@@ -48,41 +48,17 @@ class CommonCodeWithPlatformSymbolsIT : KGPBaseTest() {
             projectPath.resolve("src/commonMain/kotlin/commonTest.kt").replaceWithVersion("useMemberFunctionFromExpectClass")
 
             build(taskToExecute) {
+                printBuildOutput()
                 assertTasksExecuted(taskToExecute)
-       //         assertNoIncrementalBuildForAnyReason()
+                assertNonIncrementalCompilation(BuildAttribute.UNSAFE_INCREMENTAL_CHANGE_KT_62686)
             }
         }
     }
 
     @GradleTest
-    @DisplayName("kt-62686-mpp-jvm-expect-touched-dep")
+    @DisplayName("Use top level function that is overloaded in platform sourceSet")
     @TestMetadata("kt-62686-mpp-jvm-expect-dep")
-    fun testKt62686v2(gradleVersion: GradleVersion) {
-        project(
-            "kt-62686-mpp-jvm-expect-dep", gradleVersion
-        ) {
-            val taskToExecute = ":compileKotlinJvm"
-
-            val sourceFileToTouch = projectPath.resolve("src/commonMain/kotlin/commonTest.kt")
-            sourceFileToTouch.replaceWithVersion("useMemberFunctionFromExpectClass")
-
-            build(taskToExecute) {
-                assertTasksExecuted(taskToExecute)
-            }
-
-            sourceFileToTouch.appendText("\n // no change, really \n")
-
-            build(taskToExecute) {
-                assertTasksExecuted(taskToExecute)
-      ///          assertNoIncrementalBuildForAnyReason()
-            }
-        }
-    }
-
-    @GradleTest
-    @DisplayName("kt-62686-mpp-jvm-fun-new-dep")
-    @TestMetadata("kt-62686-mpp-jvm-expect-dep")
-    fun testKt62686v3(gradleVersion: GradleVersion) {
+    fun testIncrementalBuildWithOverloadedTopLevelFunction(gradleVersion: GradleVersion) {
         project(
             "kt-62686-mpp-jvm-expect-dep", gradleVersion
         ) {
@@ -95,7 +71,7 @@ class CommonCodeWithPlatformSymbolsIT : KGPBaseTest() {
 
             build(taskToExecute) {
                 assertTasksExecuted(taskToExecute)
- //               printBuildOutput()
+                assertNonIncrementalCompilation(BuildAttribute.UNSAFE_INCREMENTAL_CHANGE_KT_62686)
             }
         }
     }
