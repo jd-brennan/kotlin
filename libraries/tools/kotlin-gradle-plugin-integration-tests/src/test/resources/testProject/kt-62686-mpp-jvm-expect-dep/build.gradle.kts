@@ -8,5 +8,9 @@ repositories {
 }
 
 kotlin {
-    jvm()
+    jvm().compilations.all {
+        compilerOptions.configure {
+            verbose.convention(true)
+        }
+    }
 }

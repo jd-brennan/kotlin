@@ -48,7 +48,6 @@ class CommonCodeWithPlatformSymbolsIT : KGPBaseTest() {
             projectPath.resolve("src/commonMain/kotlin/commonTest.kt").replaceWithVersion("useMemberFunctionFromExpectClass")
 
             build(taskToExecute) {
-                printBuildOutput()
                 assertTasksExecuted(taskToExecute)
                 assertNonIncrementalCompilation(BuildAttribute.UNSAFE_INCREMENTAL_CHANGE_KT_62686)
             }
