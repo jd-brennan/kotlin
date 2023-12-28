@@ -1027,46 +1027,9 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
         }
     }
 
-    private fun listZipContent(archivePath: Path) {
-        println("### $archivePath content:")
-        ZipInputStream(archivePath.inputStream()).use { zipIS ->
-            while (true) {
-                val entry = zipIS.nextEntry ?: break
-                println("'${entry}', isDirectory: ${entry.isDirectory}")
-                ZipFile(archivePath.toFile()).getInputStream(entry).bufferedReader().readText().also {
-                    println("    $it")
-                }
-            }
-        }
-    }
-
-    @Test
-    fun slashFile() {
-        val root = createTempDirectory().cleanupRecursively()
-        val zipRoot = root.resolve("Archive1.zip")
-        ZipOutputStream(zipRoot.outputStream()).use { out ->
-            out.putNextEntry(ZipEntry("/"))
-            out.write("/".toByteArray())
-            out.closeEntry()
-
-            out.putNextEntry(ZipEntry("dir/"))
-            out.closeEntry()
-
-            out.putNextEntry(ZipEntry("dir//"))
-            out.write("dir//".toByteArray())
-            out.closeEntry()
-
-            out.putNextEntry(ZipEntry("file/"))
-            out.write("file/".toByteArray())
-            out.closeEntry()
-        }
-        listZipContent(zipRoot)
-    }
-
     private fun withZip(name: String, entries: List<String>, block: (parent: Path, zipRoot: Path) -> Unit) {
         val parent = createTempDirectory().cleanupRecursively()
         val archive = createZipFile(parent, name, entries)
-        listZipContent(archive)
         val zipFs: FileSystem
         try {
             val classLoader: ClassLoader? = null
@@ -1444,8 +1407,6 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
     fun legalDirectorySymbols() {
         createTestFiles().cleanupRecursively().let { root ->
             val path = root.resolve("1/3/.")
-            println("### $path")
-            println("    normalized: ${path.normalize()}")
 
             testVisitedFiles(listOf("", "4.txt", "5.txt"), path.walkIncludeDirectories(), path)
 
@@ -1469,8 +1430,6 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
 
         createTestFiles().cleanupRecursively().let { root ->
             val path = root.resolve("1/3/4.txt/.")
-            println("### $path")
-            println("    normalized: ${path.normalize()}")
 
             // Empty list in Linux and macOS, listOf("1/3/4.txt") in Windows
             val content = path.walkIncludeDirectories().toList()
@@ -1499,8 +1458,6 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
 
         createTestFiles().cleanupRecursively().let { root ->
             val path = root.resolve("1/3/..")
-            println("### $path")
-            println("    normalized: ${path.normalize()}")
 
             testVisitedFiles(listOf("", "2", "3", "3/4.txt", "3/5.txt"), path.walkIncludeDirectories(), path)
 
@@ -1522,8 +1479,6 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
 
         createTestFiles().cleanupRecursively().let { root ->
             val path = root.resolve("1/3/4.txt/..")
-            println("### $path")
-            println("    normalized: ${path.normalize()}")
 
             testVisitedFiles(listOf(), path.walkIncludeDirectories(), path)
 
