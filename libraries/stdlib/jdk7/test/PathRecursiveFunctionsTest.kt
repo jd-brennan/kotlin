@@ -1164,7 +1164,8 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
             val dotFileTarget = root.resolve("UnzipArchive1-dotFile")
             testCopyFailsWithIllegalFileName(dotFile, dotFileTarget, dotFile)
             val dotDirTarget = root.resolve("UnzipArchive1-dotDir")
-            testCopySucceeds(dotDir, dotDirTarget, setOf(dotDirTarget))
+            // Fails in Linux and Window, succeeds in macOS
+            testCopyMaybeFailsWithIllegalFileName(dotDir, dotDirTarget, dotDir, setOf(dotDirTarget))
 
             testDeleteFailsWithIllegalFileName(zipRoot, dotFile)
             testDeleteFailsWithIllegalFileName(dotFile, dotFile)
@@ -1233,12 +1234,15 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
 
     @Test
     fun zipSlashFileName() {
+        // TODO: In Windows: The process cannot access the file because it is being used by another process.
         withZip("Archive1.zip", listOf("normal", "/")) { root, zipRoot ->
             // Fails in macOS, succeeds in Linux and Windows
             testWalkMaybeFailsWithLoop(zipRoot, zipRoot)
 
             val target = root.resolve("UnzipArchive1")
-            testCopyFailsWithLoop(zipRoot, target, zipRoot)
+
+            // Fails in macOS, succeeds in Linux and Windows
+            testCopyMaybeFailsWithLoop(zipRoot, target, zipRoot)
 
             testDeleteFailsWithLoop(zipRoot, zipRoot)
         }
@@ -1251,7 +1255,7 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
             // Fails in macOS, succeeds in Linux and Windows
             testCopyMaybeFailsWithLoop(zipRoot, target, zipRoot)
 
-            testDeleteFailsWithLoop(zipRoot, zipRoot)
+            testDeleteFailsWithLoop(zipRoot, zipRoot) // TODO: In Linux: java.lang.NullPointerException
         }
 
         withZip("Archive3.zip", listOf("a/", "a//")) { root, zipRoot ->
@@ -1279,6 +1283,7 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
     // KT-63103
     @Test
     fun zipSneakyFileName() {
+        // TODO: In Windows: The process cannot access the file because it is being used by another process.
         withZip("Archive1.zip", listOf("normal", "../sneaky")) { root, zipRoot ->
             root.resolve("sneaky").createFile().also { it.writeText("outer sneaky") }
             val doubleDotsDir = zipRoot.resolve("../")
@@ -1369,7 +1374,9 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
             assertFailsWith<FileSystemException> {
                 zipRoot.deleteRecursively()
             }.also { exception ->
+                // Path.deleteIfExists throws NullPointerException
                 val suppressed = exception.suppressed.single()
+                suppressed.printStackTrace()
                 assertIs<NullPointerException>(suppressed)
             }
             testVisitedFiles(listOf(""), zipRoot.walkIncludeDirectories(), zipRoot)
@@ -1435,17 +1442,20 @@ class PathRecursiveFunctionsTest : AbstractPathTest() {
             val content = path.walkIncludeDirectories().toList()
             assertContains(listOf(emptyList(), listOf(path)), content)
 
-            // TODO: In Windows: IllegalFileNameException: \1\3\4.txt\.
-            assertFailsWith<NoSuchFileException> {
+            // Copy fails in Linux and macOS, succeeds in Windows
+            try {
                 val target = root.resolve("target")
                 path.copyToRecursively(target, followLinks = false)
-            }.also { exception ->
+                assertEquals(listOf(target), target.walkIncludeDirectories().toList())
+            } catch (exception: NoSuchFileException) {
                 assertEquals(path.toString(), exception.file)
             }
 
-            assertFailsWith<FileSystemException> { // TODO: In Windows: but was completed successfully.
+            // Delete fails in Linux and macOS, succeeds in Windows
+            try {
                 path.deleteRecursively()
-            }.also { exception ->
+                assertFalse(path.exists())
+            } catch (exception: FileSystemException) {
                 // Path.deleteIfExists() throws java.nio.file.FileSystemException: /1/3/4.txt/.: Not a directory
                 val suppressed = exception.suppressed.single()
                 suppressed.printStackTrace()
