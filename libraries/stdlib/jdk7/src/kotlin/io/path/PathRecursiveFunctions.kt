@@ -220,7 +220,10 @@ public fun Path.copyToRecursively(
             }
         }
         onVisitFile { file, attributes ->
-            file.checkFileName()
+            if (stack.isNotEmpty()) {
+                // Check only for files inside a directory
+                file.checkFileName()
+            }
             copy(file, attributes)
         }
         onVisitFileFailed(::error)
