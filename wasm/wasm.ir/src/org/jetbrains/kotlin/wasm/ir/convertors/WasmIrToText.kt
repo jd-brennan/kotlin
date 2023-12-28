@@ -6,9 +6,12 @@
 package org.jetbrains.kotlin.wasm.ir.convertors
 
 import org.jetbrains.kotlin.wasm.ir.*
+import org.jetbrains.kotlin.wasm.ir.source.location.DebugInformationGenerator
+import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocation
+import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocationMappingToText
 
 open class SExpressionBuilder {
-    protected val stringBuilder = StringBuilder()
+    protected val stringBuilder = StringBuilderWithLocations()
     protected var indent = 0
 
     protected inline fun indented(body: () -> Unit) {
@@ -45,7 +48,19 @@ open class SExpressionBuilder {
 }
 
 
-class WasmIrToText : SExpressionBuilder() {
+class WasmIrToText(
+    private val debugInformationGenerator: DebugInformationGenerator? = null
+) : SExpressionBuilder(), DebuggableTargetGenerator {
+    override fun appendString(string: String) {
+        stringBuilder.append(" \"$string\"")
+    }
+
+    override fun appendCustomSection(content: DebuggableTargetGenerator.() -> Unit) {
+        stringBuilder.append("(* @custom")
+        content()
+        stringBuilder.append(" *)")
+    }
+
     fun appendOffset(value: UInt) {
         if (value != 0u)
             appendElement("offset=$value")
@@ -59,6 +74,15 @@ class WasmIrToText : SExpressionBuilder() {
     }
 
     private fun appendInstr(wasmInstr: WasmInstr) {
+        wasmInstr.location?.let {
+            debugInformationGenerator?.addLocation(
+                SourceLocationMappingToText(
+                    it,
+                    SourceLocation.Location("", stringBuilder.lineNumber, stringBuilder.columnNumber),
+                )
+            )
+        }
+
         val op = wasmInstr.operator
 
         if (op.opcode == WASM_OP_PSEUDO_OPCODE) {
@@ -569,6 +593,34 @@ class WasmIrToText : SExpressionBuilder() {
             stringBuilder.append(s.toByteArray().toWatData())
         }
     }
+}
+
+class StringBuilderWithLocations() {
+    private val builder = StringBuilder()
+
+    var lineNumber: Int = 0
+        private set
+
+    var columnNumber: Int = 0
+        private set
+
+    fun append(char: Char) {
+        builder.append(char)
+        columnNumber += 1
+    }
+
+    fun append(text: String) {
+        builder.append(text)
+        columnNumber += text.length
+    }
+
+    fun appendLine() {
+        builder.appendLine()
+        lineNumber += 1
+        columnNumber = 0
+    }
+
+    override fun toString() = builder.toString()
 }
 
 

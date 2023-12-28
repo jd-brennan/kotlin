@@ -9,9 +9,7 @@ import org.jetbrains.kotlin.wasm.ir.*
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import kotlinx.collections.immutable.*
-import org.jetbrains.kotlin.wasm.ir.source.location.Box
-import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocation
-import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocationMapping
+import org.jetbrains.kotlin.wasm.ir.source.location.*
 
 private object WasmBinary {
     const val MAGIC = 0x6d736100u
@@ -56,15 +54,20 @@ class WasmIrToBinary(
     val module: WasmModule,
     val moduleName: String,
     val emitNameSection: Boolean,
-    private val sourceMapFileName: String? = null,
-    private val sourceLocationMappings: MutableList<SourceLocationMapping>? = null
-) {
+    private val debugInformationGenerator: DebugInformationGenerator? = null
+) : DebuggableTargetGenerator {
     private var b: ByteWriter = ByteWriter.OutputStream(outputStream)
 
     // "Stack" of offsets waiting initialization. 
     // Since blocks have as a prefix variable length number encoding its size, we can't calculate absolute offsets inside those blocks
     // until we generate the whole block and generate size. So, we put them into "stack" and initialize as soon as we have all required data.
     private var offsets = persistentListOf<Box>()
+
+    override fun appendString(string: String) =
+        b.writeString(string)
+
+    override fun appendCustomSection(content: DebuggableTargetGenerator.() -> Unit) =
+        appendSection(WasmBinary.Section.CUSTOM) { content() }
 
     fun appendWasmModule() {
         b.writeUInt32(WasmBinary.MAGIC)
@@ -174,13 +177,7 @@ class WasmIrToBinary(
                 appendTextSection(definedFunctions)
             }
 
-            if (sourceMapFileName != null) {
-                // Custom section with URL to sourcemap
-                appendSection(WasmBinary.Section.CUSTOM) {
-                    b.writeString("sourceMappingURL")
-                    b.writeString(sourceMapFileName)
-                }
-            }
+            debugInformationGenerator?.appendDebugInformation(this@WasmIrToBinary)
         }
     }
 
@@ -247,7 +244,7 @@ class WasmIrToBinary(
 
     private fun appendInstr(instr: WasmInstr) {
         instr.location?.let {
-            sourceLocationMappings?.add(SourceLocationMapping(offsets + Box(b.written), it))
+            debugInformationGenerator?.addLocation(SourceLocationMappingToBinary(it, offsets + Box(b.written)))
         }
 
         val opcode = instr.operator.opcode
