@@ -88,7 +88,7 @@ private fun KotlinType.buildPossiblyInnerType(
             "${arguments.size - toIndex} trailing arguments were found in $this type"
         }
 
-        return PossiblyInnerType(classifierDescriptor, arguments.subList(index, arguments.size), null)
+        return PossiblyInnerType(classifierDescriptor, arguments.subList(index, toIndex), null)
     }
 
     val argumentsSubList = arguments.subList(index, toIndex)
