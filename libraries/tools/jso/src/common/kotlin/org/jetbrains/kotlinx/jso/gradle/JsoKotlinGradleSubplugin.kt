@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.gradle.plugin.*
 
 class JsoKotlinGradleSubplugin : KotlinCompilerPluginSupportPlugin {
     companion object {
-        const val JSO_ARTIFACT_NAME = "kotlin-jso-compiler-plugin-embeddable"
+        const val JSO_ARTIFACT_NAME = "kotlinx-jso-compiler-plugin-embeddable"
     }
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
