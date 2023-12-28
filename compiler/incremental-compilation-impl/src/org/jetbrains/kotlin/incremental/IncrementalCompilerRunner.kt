@@ -167,9 +167,11 @@ abstract class IncrementalCompilerRunner<
         class Failed(val reason: BuildAttribute, val cause: Throwable) : ICResult
     }
 
+    // Be aware that [tryCompileIncrementally] catches a lot of exceptions internally.
+    // So this transformer should be used for very specific things, like cache closing, that are
+    // related to the transaction as a whole rather than any compilation step.
     private fun incrementalCompilationExceptionTransformer(t: Throwable): ICResult = when (t) {
         is CachesManagerCloseException -> ICResult.Failed(IC_FAILED_TO_CLOSE_CACHES, t)
-        is RequireRebuildForCorrectnessInKMPException -> ICResult.RequiresRebuild(UNSAFE_INCREMENTAL_CHANGE_KT_62686)
         else -> throw t
     }
 
@@ -253,6 +255,8 @@ abstract class IncrementalCompilerRunner<
                         abiSnapshotData,
                         messageCollector,
                     )
+                } catch (e: RequireRebuildForCorrectnessInKMPException) {
+                    return ICResult.RequiresRebuild(UNSAFE_INCREMENTAL_CHANGE_KT_62686)
                 } catch (e: Throwable) {
                     return ICResult.Failed(IC_FAILED_TO_COMPILE_INCREMENTALLY, e)
                 }
