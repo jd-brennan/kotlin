@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.incremental
 
 import org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments
+import org.jetbrains.kotlin.config.LanguageVersion
 import java.io.File
 
 /**
@@ -22,33 +23,37 @@ class FragmentContext(
      */
     private val fileToFragment: Map<String, String>,
     /**
-     * If a fragment isn't refined by any other fragments, it's allowed to have incremental compilation
+     * If a fragment isn't refined by any other fragments, it's allowed to have incremental compilation.
+     * Otherwise, issues from KT-62686 are applicable.
      */
     private val leafFragments: Set<String>
 ) {
     /**
+     * Returns true, if any file from dirtySet is a part of refined fragment (for example: common, apple, linux).
+     * It is relevant to KT-62686, because in k2 "refined" fragments aren't supposed to see symbols from "refining" fragments,
+     * but they do.
+     *
      * Use of `absolutePath` is coordinated with K2MultiplatformStructure.fragmentSourcesCompilerArgs
      */
     fun dirtySetTouchesNonLeafFragments(dirtySet: Iterable<File>): Boolean {
-        //TODO: if you really want to test it in K1 mode, need to either do something silly, or implement
-        // the logic on Gradle Plugin side.
-        // An example of "something silly" would be `absolutePath.contains("common")`
-        // I recommend to just disable IC, though
         return dirtySet.any { file ->
             !leafFragments.contains(fileToFragment[file.absolutePath])
         }
     }
 
-    //TODO if you really want to test "partial IC", something like
-    // `fun promoteDirtyFilesToDirtyFragments(dirtySet: Iterable<File>): Iterable<File>`
-    // can be implemented
-
     companion object {
-        fun fromCompilerArguments(args: CommonCompilerArguments): FragmentContext? {
-            val noFragmentData = listOf(args.fragments, args.fragmentRefines, args.fragmentSources).any {
+        private fun canCreateFragmentContext(args: CommonCompilerArguments): Boolean {
+            // fragmentContext solves k1-only issues; also, in k1 mode we don't even expect the fragment-related args
+            val isCorrectLanguageVersion = (LanguageVersion.fromVersionString(args.languageVersion) ?: LanguageVersion.LATEST_STABLE).usesK2
+
+            val hasAllRequiredArguments = listOf(args.fragments, args.fragmentRefines, args.fragmentSources).none {
                 it.isNullOrEmpty()
             }
-            if (noFragmentData) {
+            return isCorrectLanguageVersion && hasAllRequiredArguments
+        }
+
+        fun fromCompilerArguments(args: CommonCompilerArguments): FragmentContext? {
+            if (!canCreateFragmentContext(args)) {
                 return null
             }
 
